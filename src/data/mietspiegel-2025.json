@@ -1,0 +1,2044 @@
+{
+  "id": "muenchen-mietspiegel-2025",
+  "title": "Mietspiegel für München 2025 (qualifizierter Mietspiegel)",
+  "specVersion": "1.0.0",
+  "compiledOn": "2026-09-25",
+  "compiledBy": "munichMCP research (unofficial). Not an official publication of the Landeshauptstadt München.",
+  "language": "Labels are the official German terms; explanations and condition texts are English paraphrases (the brochure pages hold the authoritative German wording).",
+  "units": {
+    "rentPerSqm": "EUR per m² living area per month",
+    "rentMonthly": "EUR per month",
+    "rentType": "Nettokaltmiete (net rent without operating costs) unless operating costs are explicitly included (see operatingCosts)",
+    "numbers": "All money amounts are exact decimals with 2 places. Convert to integer cents (Math.round(eur*100)) and compute with integer or decimal arithmetic, never with raw binary floating point (see computation.arithmetic)."
+  },
+  "sources": {
+    "calculator": {
+      "url": "https://2025.mietspiegel-muenchen.de/berechnung.html",
+      "note": "Vue single page app. The calculation itself runs on the server; the client JS holds the option lists, labels, conflict rules and a copy of the surcharge table.",
+      "jsFiles": [
+        "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+        "https://2025.mietspiegel-muenchen.de/js/index.0e465079.js",
+        "https://2025.mietspiegel-muenchen.de/js/chunk-vendors.2448a2af.js"
+      ],
+      "jsModules": {
+        "57158": "i18n messages (de): option labels, validation texts, Betriebskosten labels",
+        "20819": "router and all step components: option ids, per-option conflict rules, year class mapping (computeSelection), surcharge table page (/zuschlaege), Betriebskosten step, result page with the POST",
+        "36781": "Vuex store: request body = state.berechnung, response copied to state.ergebnis",
+        "86336": "GET /api/environmentInfo (map URLs)"
+      },
+      "calculationEndpoint": "POST https://2025.mietspiegel-muenchen.de/api/backend-service/berechnung",
+      "retrievedOn": "2026-09-25"
+    },
+    "brochure": {
+      "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+      "title": "Mietspiegel für München 2025, Informationen zur ortsüblichen Miete, Stand 01/2024",
+      "pageNumbering": "Printed page numbers equal PDF page indexes (38 pages)."
+    },
+    "documentation": {
+      "url": "https://2025.mietspiegel-muenchen.de/broschueren/Dokumentation_MS25.pdf",
+      "title": "Dokumentation zum Mietspiegel für München 2025 (LMU / Kantar)",
+      "pageNumbering": "PDF page index (printed page number = PDF index minus 2)."
+    },
+    "cityPage": "https://stadt.muenchen.de/infos/mietspiegel.html",
+    "sitePages": [
+      "https://2025.mietspiegel-muenchen.de/grundlagen.html",
+      "https://2025.mietspiegel-muenchen.de/gesetzeslage.html",
+      "https://2025.mietspiegel-muenchen.de/dokumentation.html",
+      "https://2025.mietspiegel-muenchen.de/impressum.html"
+    ]
+  },
+  "legal": {
+    "type": "Qualifizierter Mietspiegel nach § 558d BGB",
+    "dataPeriod": {
+      "from": "2018-02",
+      "to": "2024-01",
+      "meaning": "Rents newly agreed or changed (except changes under § 560 BGB) in this period"
+    },
+    "stichmonat": "2024-01",
+    "brochureStand": "01/2024",
+    "adoptedAndPublished": {
+      "date": "2025-03-20",
+      "body": "Sozialausschuss des Stadtrats (öffentlicher Beschluss), Mietspiegel beschlossen und veröffentlicht"
+    },
+    "recognisedAsQualified": {
+      "date": "2025-03-26",
+      "body": "Vollversammlung des Stadtrates der Landeshauptstadt München",
+      "document": "Sitzungsvorlage Nr. 20-26 / V 15504",
+      "publicationOfRecognition": "Amtsblatt der Landeshauptstadt München (decision item 3)"
+    },
+    "validFrom": "2025-03-20",
+    "validFromNote": "Earliest date stated by the city (publication after the Sozialausschuss decision). Qualified status was recognised on 2025-03-26.",
+    "validUntil": null,
+    "validUntilNote": "No end date is published. It stays the current Munich Mietspiegel until replaced (Munich re-creates its Mietspiegel every two years since a council decision of 27.07.2011; the successor would be a Mietspiegel 2027). § 558d Abs. 2 BGB (as quoted on gesetzeslage.html) requires adaptation every two years and re-creation after four years, measured from the data Stichtag. Whether and when the legal presumption of § 558d Abs. 3 BGB lapses is a legal question and is NOT determined here.",
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [1, 6, 8]
+      },
+      "other": [
+        "https://2025.mietspiegel-muenchen.de/gesetzeslage.html",
+        "https://2025.mietspiegel-muenchen.de/dokumentation.html",
+        "https://stadt.muenchen.de/infos/mietspiegel.html",
+        "Dokumentation Anhang C (scanned council decision, PDF pages 136-137)"
+      ]
+    }
+  },
+  "applicability": {
+    "scope": "Freely financed (frei finanzierte) rental flats in the city area of Munich.",
+    "livingArea": {
+      "minSqm": 20,
+      "maxSqm": 160,
+      "inclusive": true,
+      "maxDecimals": 3,
+      "calculatorBehaviour": "UI rejects values outside 20..160 or with more than 3 decimals; the server returns HTTP 400 for areas outside 20..160 (verified with 15, 19.999, 160.001, 200)."
+    },
+    "yearOfConstruction": {
+      "maxYear": 2023,
+      "calculatorBehaviour": "Manual year entry accepts integers 0..2023; later years are rejected (no table column after 2022-2023).",
+      "rule": "Use the year the building was completed. After a Kernsanierung (gutting renovation), or where new living space was created by extension or conversion (e.g. attic conversion), use the year in which that construction work was completed. Equipment installed or repairs/modernisation paid for by the tenant must not be considered in Table 3.",
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [10]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819, Baujahr step: computeSelection(), info panel 'Modernisierung'"
+          ]
+        }
+      }
+    },
+    "notApplicable": [
+      "preisgebundene Wohnungen (e.g. Sozialwohnungen mit Kostenmiete, Belegrechtswohnungen)",
+      "gewerblich genutzte Räume",
+      "Obdachlosenunterkünfte",
+      "Studierenden- und Jugendwohnheime"
+    ],
+    "notDirectlyApplicable": [
+      "möblierter Wohnraum",
+      "Einfamilienhäuser, Doppelhaushälften, Reihenhäuser, Einzelzimmer und Penthousewohnungen",
+      "Werkswohnungen",
+      "Wohnungen im Untergeschoss",
+      "Wohnraum nur zum vorübergehenden Gebrauch",
+      "mietfrei überlassener Wohnraum",
+      "selbst genutzter Wohnraum",
+      "private Untermietverhältnisse",
+      "durch behördliche Auflagen mietpreisgebundener Wohnraum",
+      "Wohnungen, deren Küche, Toilette und Bad (soweit vorhanden) von anderen Mietparteien mitbenutzt werden",
+      "Wohnungen ohne Küche, ohne Badezimmer oder ohne Toilette",
+      "Wohnungen ohne von der*dem Vermieter*in ausgestattetes Badezimmer",
+      "Wohnungen ohne eine von der*dem Vermieter*in gestellte Heizung",
+      "Wohnungen ohne von der*dem Vermieter*in gestellte Warmwasserversorgung",
+      "Wohnraum in Anstalten, Heimen oder Wohnheimen, bei denen die Mietzahlung auch Service-Leistungen abdeckt (z.B. Verpflegung oder Betreuung)",
+      "Wohnungen unter 20 m² und über 160 m² Wohnfläche"
+    ],
+    "notDirectlyApplicableNote": "For these cases the Mietspiegel may serve as orientation only; using it as a justification for a rent increase under § 558a BGB is generally not possible, although courts may accept it in individual cases.",
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [7, 16]
+      },
+      "other": [
+        "https://2025.mietspiegel-muenchen.de/grundlagen.html"
+      ]
+    }
+  },
+  "yearClasses": [
+    {
+      "id": 0,
+      "label": "bis 1918",
+      "fromYear": null,
+      "toYear": 1918
+    },
+    {
+      "id": 1,
+      "label": "1919-1929",
+      "fromYear": 1919,
+      "toYear": 1929
+    },
+    {
+      "id": 2,
+      "label": "1930-1948",
+      "fromYear": 1930,
+      "toYear": 1948
+    },
+    {
+      "id": 3,
+      "label": "1949-1966",
+      "fromYear": 1949,
+      "toYear": 1966
+    },
+    {
+      "id": 4,
+      "label": "1967-1977",
+      "fromYear": 1967,
+      "toYear": 1977
+    },
+    {
+      "id": 5,
+      "label": "1978-1988",
+      "fromYear": 1978,
+      "toYear": 1988
+    },
+    {
+      "id": 6,
+      "label": "1989-1998",
+      "fromYear": 1989,
+      "toYear": 1998
+    },
+    {
+      "id": 7,
+      "label": "1999-2008",
+      "fromYear": 1999,
+      "toYear": 2008
+    },
+    {
+      "id": 8,
+      "label": "2009-2018",
+      "fromYear": 2009,
+      "toYear": 2018
+    },
+    {
+      "id": 9,
+      "label": "2019-2021",
+      "fromYear": 2019,
+      "toYear": 2021
+    },
+    {
+      "id": 10,
+      "label": "2022-2023",
+      "fromYear": 2022,
+      "toYear": 2023
+    }
+  ],
+  "yearClassesSource": {
+    "brochure": {
+      "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+      "pages": [10, 11]
+    },
+    "calculatorJs": {
+      "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+      "locations": [
+        "module 57158 messages.de.baujahr",
+        "module 20819 Baujahr step computeSelection(): year <= 1918 -> 0, <= 1929 -> 1, <= 1948 -> 2, <= 1966 -> 3, <= 1977 -> 4, <= 1988 -> 5, <= 1998 -> 6, <= 2008 -> 7, <= 2018 -> 8, <= 2021 -> 9, <= 2023 -> 10"
+      ]
+    }
+  },
+  "baseRent": {
+    "name": "Grundpreis der monatlichen Nettomiete (Tabelle 2)",
+    "unit": "EUR/m²/month",
+    "note": "The Grundpreis is not the average local rent; it becomes the average only after adding Table 3 surcharges/deductions (and operating costs, if any). Model: a + f(W) + g(B), no area/year interaction (Dokumentation section 2.2 and 2.8).",
+    "rowSelection": {
+      "rule": "n = ceil(livingArea). Use the row whose integer range [areaFrom, areaTo] contains n; the first row (20-22) also covers 20 <= area <= 22. Intermediate values go to the next higher row (brochure example: 80.3 m² -> row 81-82).",
+      "verifiedExamples": {
+        "20": "20-22",
+        "20.5": "20-22",
+        "22": "20-22",
+        "22.001": "23-24",
+        "24": "23-24",
+        "24.001": "25-26",
+        "80": "79-80",
+        "80.001": "81-82",
+        "80.3": "81-82",
+        "80.999": "81-82",
+        "81": "81-82",
+        "158.5": "157-158",
+        "159.001": "159-160",
+        "160": "159-160"
+      }
+    },
+    "columns": [
+      "bis 1918",
+      "1919-1929",
+      "1930-1948",
+      "1949-1966",
+      "1967-1977",
+      "1978-1988",
+      "1989-1998",
+      "1999-2008",
+      "2009-2018",
+      "2019-2021",
+      "2022-2023"
+    ],
+    "rows": [
+      {
+        "areaFrom": 20,
+        "areaTo": 22,
+        "values": [19.36, 19.15, 18.95, 19.29, 19.46, 19.37, 19.28, 19.97, 21.5, 22.95, 23.61]
+      },
+      {
+        "areaFrom": 23,
+        "areaTo": 24,
+        "values": [18.57, 18.36, 18.16, 18.51, 18.68, 18.59, 18.5, 19.18, 20.71, 22.17, 22.82]
+      },
+      {
+        "areaFrom": 25,
+        "areaTo": 26,
+        "values": [17.85, 17.64, 17.44, 17.78, 17.95, 17.86, 17.77, 18.46, 19.99, 21.44, 22.1]
+      },
+      {
+        "areaFrom": 27,
+        "areaTo": 28,
+        "values": [17.18, 16.97, 16.77, 17.11, 17.28, 17.19, 17.1, 17.79, 19.32, 20.77, 21.43]
+      },
+      {
+        "areaFrom": 29,
+        "areaTo": 30,
+        "values": [16.57, 16.36, 16.15, 16.5, 16.67, 16.58, 16.49, 17.17, 18.71, 20.16, 20.81]
+      },
+      {
+        "areaFrom": 31,
+        "areaTo": 32,
+        "values": [16.0, 15.79, 15.59, 15.94, 16.11, 16.02, 15.93, 16.61, 18.14, 19.6, 20.25]
+      },
+      {
+        "areaFrom": 33,
+        "areaTo": 34,
+        "values": [15.49, 15.28, 15.08, 15.42, 15.59, 15.5, 15.41, 16.1, 17.63, 19.08, 19.74]
+      },
+      {
+        "areaFrom": 35,
+        "areaTo": 36,
+        "values": [15.02, 14.81, 14.61, 14.96, 15.13, 15.04, 14.95, 15.63, 17.16, 18.62, 19.27]
+      },
+      {
+        "areaFrom": 37,
+        "areaTo": 38,
+        "values": [14.6, 14.39, 14.19, 14.53, 14.7, 14.61, 14.52, 15.2, 16.74, 18.19, 18.85]
+      },
+      {
+        "areaFrom": 39,
+        "areaTo": 40,
+        "values": [14.21, 14.0, 13.8, 14.15, 14.32, 14.23, 14.14, 14.82, 16.35, 17.81, 18.46]
+      },
+      {
+        "areaFrom": 41,
+        "areaTo": 42,
+        "values": [13.87, 13.66, 13.46, 13.8, 13.97, 13.88, 13.79, 14.47, 16.01, 17.46, 18.12]
+      },
+      {
+        "areaFrom": 43,
+        "areaTo": 44,
+        "values": [13.56, 13.35, 13.15, 13.49, 13.66, 13.57, 13.48, 14.16, 15.7, 17.15, 17.81]
+      },
+      {
+        "areaFrom": 45,
+        "areaTo": 46,
+        "values": [13.28, 13.07, 12.87, 13.21, 13.38, 13.3, 13.21, 13.89, 15.42, 16.87, 17.53]
+      },
+      {
+        "areaFrom": 47,
+        "areaTo": 48,
+        "values": [13.03, 12.82, 12.62, 12.97, 13.14, 13.05, 12.96, 13.64, 15.17, 16.63, 17.28]
+      },
+      {
+        "areaFrom": 49,
+        "areaTo": 50,
+        "values": [12.81, 12.6, 12.4, 12.75, 12.92, 12.83, 12.74, 13.42, 14.95, 16.41, 17.06]
+      },
+      {
+        "areaFrom": 51,
+        "areaTo": 52,
+        "values": [12.62, 12.41, 12.21, 12.55, 12.72, 12.63, 12.54, 13.22, 14.76, 16.21, 16.87]
+      },
+      {
+        "areaFrom": 53,
+        "areaTo": 54,
+        "values": [12.44, 12.23, 12.03, 12.38, 12.55, 12.46, 12.37, 13.05, 14.58, 16.04, 16.69]
+      },
+      {
+        "areaFrom": 55,
+        "areaTo": 56,
+        "values": [12.29, 12.08, 11.88, 12.22, 12.39, 12.3, 12.21, 12.9, 14.43, 15.88, 16.54]
+      },
+      {
+        "areaFrom": 57,
+        "areaTo": 58,
+        "values": [12.15, 11.94, 11.74, 12.09, 12.25, 12.17, 12.08, 12.76, 14.29, 15.74, 16.4]
+      },
+      {
+        "areaFrom": 59,
+        "areaTo": 60,
+        "values": [12.03, 11.82, 11.62, 11.96, 12.13, 12.04, 11.95, 12.63, 14.17, 15.62, 16.28]
+      },
+      {
+        "areaFrom": 61,
+        "areaTo": 62,
+        "values": [11.91, 11.7, 11.5, 11.85, 12.02, 11.93, 11.84, 12.52, 14.05, 15.51, 16.16]
+      },
+      {
+        "areaFrom": 63,
+        "areaTo": 64,
+        "values": [11.81, 11.6, 11.4, 11.74, 11.91, 11.82, 11.73, 12.42, 13.95, 15.4, 16.06]
+      },
+      {
+        "areaFrom": 65,
+        "areaTo": 66,
+        "values": [11.71, 11.5, 11.3, 11.64, 11.81, 11.72, 11.63, 12.32, 13.85, 15.3, 15.96]
+      },
+      {
+        "areaFrom": 67,
+        "areaTo": 68,
+        "values": [11.61, 11.41, 11.2, 11.55, 11.72, 11.63, 11.54, 12.22, 13.75, 15.21, 15.86]
+      },
+      {
+        "areaFrom": 69,
+        "areaTo": 70,
+        "values": [11.52, 11.31, 11.11, 11.45, 11.62, 11.53, 11.44, 12.13, 13.66, 15.11, 15.77]
+      },
+      {
+        "areaFrom": 71,
+        "areaTo": 72,
+        "values": [11.43, 11.22, 11.01, 11.36, 11.53, 11.44, 11.35, 12.03, 13.57, 15.02, 15.67]
+      },
+      {
+        "areaFrom": 73,
+        "areaTo": 74,
+        "values": [11.33, 11.13, 10.92, 11.27, 11.44, 11.35, 11.26, 11.94, 13.47, 14.93, 15.58]
+      },
+      {
+        "areaFrom": 75,
+        "areaTo": 76,
+        "values": [11.24, 11.03, 10.83, 11.18, 11.35, 11.26, 11.17, 11.85, 13.38, 14.84, 15.49]
+      },
+      {
+        "areaFrom": 77,
+        "areaTo": 78,
+        "values": [11.16, 10.95, 10.74, 11.09, 11.26, 11.17, 11.08, 11.76, 13.3, 14.75, 15.4]
+      },
+      {
+        "areaFrom": 79,
+        "areaTo": 80,
+        "values": [11.07, 10.86, 10.66, 11.0, 11.17, 11.08, 10.99, 11.68, 13.21, 14.66, 15.32]
+      },
+      {
+        "areaFrom": 81,
+        "areaTo": 82,
+        "values": [10.99, 10.78, 10.58, 10.92, 11.09, 11.0, 10.91, 11.59, 13.13, 14.58, 15.24]
+      },
+      {
+        "areaFrom": 83,
+        "areaTo": 84,
+        "values": [10.91, 10.7, 10.49, 10.84, 11.01, 10.92, 10.83, 11.51, 13.05, 14.5, 15.15]
+      },
+      {
+        "areaFrom": 85,
+        "areaTo": 86,
+        "values": [10.83, 10.62, 10.42, 10.76, 10.93, 10.84, 10.75, 11.43, 12.97, 14.42, 15.08]
+      },
+      {
+        "areaFrom": 87,
+        "areaTo": 88,
+        "values": [10.75, 10.54, 10.34, 10.69, 10.86, 10.77, 10.68, 11.36, 12.89, 14.35, 15.0]
+      },
+      {
+        "areaFrom": 89,
+        "areaTo": 90,
+        "values": [10.68, 10.47, 10.27, 10.62, 10.79, 10.7, 10.61, 11.29, 12.82, 14.28, 14.93]
+      },
+      {
+        "areaFrom": 91,
+        "areaTo": 92,
+        "values": [10.62, 10.41, 10.2, 10.55, 10.72, 10.63, 10.54, 11.22, 12.76, 14.21, 14.86]
+      },
+      {
+        "areaFrom": 93,
+        "areaTo": 94,
+        "values": [10.55, 10.34, 10.14, 10.49, 10.66, 10.57, 10.48, 11.16, 12.69, 14.15, 14.8]
+      },
+      {
+        "areaFrom": 95,
+        "areaTo": 96,
+        "values": [10.49, 10.28, 10.08, 10.43, 10.6, 10.51, 10.42, 11.1, 12.63, 14.09, 14.74]
+      },
+      {
+        "areaFrom": 97,
+        "areaTo": 98,
+        "values": [10.44, 10.23, 10.03, 10.37, 10.54, 10.45, 10.36, 11.05, 12.58, 14.03, 14.69]
+      },
+      {
+        "areaFrom": 99,
+        "areaTo": 100,
+        "values": [10.39, 10.18, 9.98, 10.32, 10.49, 10.4, 10.31, 11.0, 12.53, 13.98, 14.64]
+      },
+      {
+        "areaFrom": 101,
+        "areaTo": 102,
+        "values": [10.35, 10.14, 9.93, 10.28, 10.45, 10.36, 10.27, 10.95, 12.49, 13.94, 14.59]
+      },
+      {
+        "areaFrom": 103,
+        "areaTo": 104,
+        "values": [10.31, 10.1, 9.9, 10.24, 10.41, 10.32, 10.23, 10.91, 12.45, 13.9, 14.56]
+      },
+      {
+        "areaFrom": 105,
+        "areaTo": 106,
+        "values": [10.27, 10.06, 9.86, 10.21, 10.38, 10.29, 10.2, 10.88, 12.41, 13.87, 14.52]
+      },
+      {
+        "areaFrom": 107,
+        "areaTo": 108,
+        "values": [10.25, 10.04, 9.83, 10.18, 10.35, 10.26, 10.17, 10.85, 12.39, 13.84, 14.49]
+      },
+      {
+        "areaFrom": 109,
+        "areaTo": 110,
+        "values": [10.23, 10.02, 9.81, 10.16, 10.33, 10.24, 10.15, 10.83, 12.37, 13.82, 14.47]
+      },
+      {
+        "areaFrom": 111,
+        "areaTo": 112,
+        "values": [10.21, 10.0, 9.8, 10.14, 10.31, 10.22, 10.13, 10.82, 12.35, 13.8, 14.46]
+      },
+      {
+        "areaFrom": 113,
+        "areaTo": 114,
+        "values": [10.2, 9.99, 9.79, 10.14, 10.31, 10.22, 10.13, 10.81, 12.34, 13.8, 14.45]
+      },
+      {
+        "areaFrom": 115,
+        "areaTo": 116,
+        "values": [10.2, 9.99, 9.79, 10.13, 10.3, 10.22, 10.13, 10.81, 12.34, 13.79, 14.45]
+      },
+      {
+        "areaFrom": 117,
+        "areaTo": 118,
+        "values": [10.21, 10.0, 9.79, 10.14, 10.31, 10.22, 10.13, 10.81, 12.35, 13.8, 14.45]
+      },
+      {
+        "areaFrom": 119,
+        "areaTo": 120,
+        "values": [10.22, 10.01, 9.81, 10.15, 10.32, 10.23, 10.14, 10.82, 12.36, 13.81, 14.47]
+      },
+      {
+        "areaFrom": 121,
+        "areaTo": 122,
+        "values": [10.23, 10.02, 9.82, 10.17, 10.34, 10.25, 10.16, 10.84, 12.37, 13.83, 14.48]
+      },
+      {
+        "areaFrom": 123,
+        "areaTo": 124,
+        "values": [10.26, 10.05, 9.84, 10.19, 10.36, 10.27, 10.18, 10.86, 12.4, 13.85, 14.5]
+      },
+      {
+        "areaFrom": 125,
+        "areaTo": 126,
+        "values": [10.28, 10.07, 9.87, 10.22, 10.38, 10.3, 10.21, 10.89, 12.42, 13.88, 14.53]
+      },
+      {
+        "areaFrom": 127,
+        "areaTo": 128,
+        "values": [10.31, 10.1, 9.9, 10.25, 10.42, 10.33, 10.24, 10.92, 12.45, 13.91, 14.56]
+      },
+      {
+        "areaFrom": 129,
+        "areaTo": 130,
+        "values": [10.35, 10.14, 9.93, 10.28, 10.45, 10.36, 10.27, 10.95, 12.49, 13.94, 14.59]
+      },
+      {
+        "areaFrom": 131,
+        "areaTo": 132,
+        "values": [10.38, 10.17, 9.97, 10.32, 10.49, 10.4, 10.31, 10.99, 12.52, 13.98, 14.63]
+      },
+      {
+        "areaFrom": 133,
+        "areaTo": 134,
+        "values": [10.42, 10.21, 10.01, 10.36, 10.52, 10.44, 10.35, 11.03, 12.56, 14.01, 14.67]
+      },
+      {
+        "areaFrom": 135,
+        "areaTo": 136,
+        "values": [10.46, 10.25, 10.05, 10.4, 10.57, 10.48, 10.39, 11.07, 12.6, 14.06, 14.71]
+      },
+      {
+        "areaFrom": 137,
+        "areaTo": 138,
+        "values": [10.5, 10.29, 10.09, 10.44, 10.61, 10.52, 10.43, 11.11, 12.64, 14.1, 14.75]
+      },
+      {
+        "areaFrom": 139,
+        "areaTo": 140,
+        "values": [10.55, 10.34, 10.14, 10.48, 10.65, 10.56, 10.47, 11.15, 12.69, 14.14, 14.8]
+      },
+      {
+        "areaFrom": 141,
+        "areaTo": 142,
+        "values": [10.59, 10.38, 10.18, 10.52, 10.69, 10.61, 10.52, 11.2, 12.73, 14.18, 14.84]
+      },
+      {
+        "areaFrom": 143,
+        "areaTo": 144,
+        "values": [10.63, 10.42, 10.22, 10.57, 10.74, 10.65, 10.56, 11.24, 12.77, 14.23, 14.88]
+      },
+      {
+        "areaFrom": 145,
+        "areaTo": 146,
+        "values": [10.68, 10.47, 10.26, 10.61, 10.78, 10.69, 10.6, 11.28, 12.82, 14.27, 14.92]
+      },
+      {
+        "areaFrom": 147,
+        "areaTo": 148,
+        "values": [10.72, 10.51, 10.31, 10.65, 10.82, 10.73, 10.64, 11.32, 12.86, 14.31, 14.97]
+      },
+      {
+        "areaFrom": 149,
+        "areaTo": 150,
+        "values": [10.76, 10.55, 10.35, 10.69, 10.86, 10.77, 10.68, 11.36, 12.9, 14.35, 15.01]
+      },
+      {
+        "areaFrom": 151,
+        "areaTo": 152,
+        "values": [10.79, 10.59, 10.38, 10.73, 10.9, 10.81, 10.72, 11.4, 12.93, 14.39, 15.04]
+      },
+      {
+        "areaFrom": 153,
+        "areaTo": 154,
+        "values": [10.83, 10.62, 10.42, 10.76, 10.93, 10.84, 10.75, 11.44, 12.97, 14.42, 15.08]
+      },
+      {
+        "areaFrom": 155,
+        "areaTo": 156,
+        "values": [10.86, 10.65, 10.45, 10.79, 10.96, 10.87, 10.78, 11.47, 13.0, 14.45, 15.11]
+      },
+      {
+        "areaFrom": 157,
+        "areaTo": 158,
+        "values": [10.89, 10.68, 10.48, 10.82, 10.99, 10.9, 10.81, 11.49, 13.03, 14.48, 15.14]
+      },
+      {
+        "areaFrom": 159,
+        "areaTo": 160,
+        "values": [10.91, 10.7, 10.5, 10.84, 11.01, 10.93, 10.84, 11.52, 13.05, 14.5, 15.16]
+      }
+    ],
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [10, 11]
+      },
+      "note": "Extracted from the PDF text layer (770 cells) and verified cell by cell against the official calculation endpoint on 2026-09-25 (0 mismatches)."
+    }
+  },
+  "wohnlage": {
+    "name": "Wohnlage nach beigefügtem Stadtplan (Tabelle 3.1)",
+    "cardinality": "exactly one",
+    "options": [
+      {
+        "id": "durchschnittlich",
+        "calculatorId": 0,
+        "label": "Durchschnittliche Lage",
+        "mapColourName": "hellblau",
+        "surcharge": {
+          "eur": 0.0,
+          "cents": 0
+        },
+        "central": false,
+        "definitionEn": "Areas without the shortcomings of a simple location and without the advantages of a good location ('neither particularly good nor particularly bad')."
+      },
+      {
+        "id": "gut",
+        "calculatorId": 1,
+        "label": "Gute Lage",
+        "mapColourName": "gelb",
+        "surcharge": {
+          "eur": 0.43,
+          "cents": 43
+        },
+        "central": false,
+        "definitionEn": "Sought-after inner-city fringe locations and larger new-build areas with mostly good area structure, and quiet residential areas with garden-city character, adequate infrastructure and a positive image."
+      },
+      {
+        "id": "beste",
+        "calculatorId": 2,
+        "label": "Beste Lage",
+        "mapColourName": "hellrot",
+        "surcharge": {
+          "eur": 2.1,
+          "cents": 210
+        },
+        "central": false,
+        "definitionEn": "Particularly prestigious inner-city and near-inner-city locations and traditional villa districts."
+      },
+      {
+        "id": "zentral_durchschnittlich",
+        "calculatorId": 3,
+        "label": "Zentrale durchschnittliche Lage",
+        "mapColourName": "dunkelblau",
+        "surcharge": {
+          "eur": 0.8,
+          "cents": 80
+        },
+        "central": true,
+        "definitionEn": "Central areas meeting the criteria of the average location for which the statistical analysis identified higher rents."
+      },
+      {
+        "id": "zentral_gut",
+        "calculatorId": 4,
+        "label": "Zentrale gute Lage",
+        "mapColourName": "orange",
+        "surcharge": {
+          "eur": 2.29,
+          "cents": 229
+        },
+        "central": true,
+        "definitionEn": "Central areas meeting the criteria of the good location, plus traditionally very sought-after inner-city and near-inner-city locations with a well-grown structure, an above-average share of listed buildings and urban 'In-Viertel'; higher rents identified statistically."
+      },
+      {
+        "id": "zentral_beste",
+        "calculatorId": 5,
+        "label": "Zentrale beste Lage",
+        "mapColourName": "dunkelrot",
+        "surcharge": {
+          "eur": 2.7,
+          "cents": 270
+        },
+        "central": true,
+        "definitionEn": "Central areas meeting the criteria of the best location for which the statistical analysis identified higher rents."
+      }
+    ],
+    "modelCoefficients": {
+      "note": "Documentation Tabelle 2.7 reproduces the published amounts exactly: Zentral 0.80, WL:gute 0.43, WL:beste 2.10, Zentral*WL:gute 1.06, Zentral*WL:beste -0.20 (so zentral_gut = 0.80+0.43+1.06 = 2.29, zentral_beste = 0.80+2.10-0.20 = 2.70).",
+      "source": "Dokumentation PDF page 72 (Tabelle 2.7)"
+    },
+    "rules": [
+      "The Wohnlage is read from the official map (Stadtplan / Wohnlagenkarte, Stand January 2024).",
+      "Coloured lines along streets exposed to traffic noise or other immissions ('Lageabstufungen', occasionally also upgrades) override the area colour, but only for the first row of houses along that street.",
+      "For the line-based gradations the actual position of the flat (front building or rear building of the property) and the related impairments are decisive, not the postal address.",
+      "Commercial areas with flats and new-build areas completed after January 2024 were rated only in exceptional cases; such flats need an individual assessment, the quality of the surrounding residential areas can serve as orientation. The same applies to substantial changes of the location quality.",
+      "Classification reflects the average location quality of each area; individual deviations can require a different category in individual cases."
+    ],
+    "rangeGroup": "Categories 3, 4 and 5 (central) use the central fluctuation range, categories 0, 1, 2 the non-central one (see range).",
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [12, 13, 14, 27, 28]
+      },
+      "calculatorJs": {
+        "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+        "locations": [
+          "module 57158 messages.de.wohnlage",
+          "module 20819 page /zuschlaege (table 'Wohnlage nach beigefügtem Stadtplan')"
+        ]
+      }
+    }
+  },
+  "surcharges": {
+    "name": "Zu- und Abschläge in Euro pro m² und Monat (Tabelle 3)",
+    "general": [
+      "All amounts are EUR/m²/month and are added (deductions are negative).",
+      "Only landlord-provided equipment counts; tenant-installed equipment or tenant-paid modernisation must not be considered.",
+      "Threshold values (Schwellenwerte, e.g. a building year just outside a limit) are NOT handled in Table 3 but may be reflected in Table 5 item 5 (justified deviations).",
+      "'Wohnraum' (living room) excludes bath, WC, hall and (Wohn-)Küche wherever the brochure says only living rooms are considered."
+    ],
+    "gebaeudetyp": {
+      "name": "3.2 Gebäudetypen",
+      "cardinality": "at most one (else 'anderer', 0.00)",
+      "note": "An at least partially converted attic (Speicher/Dachboden) counts as a storey.",
+      "options": [
+        {
+          "id": "hochhaus",
+          "calculatorId": 0,
+          "label": "Hochhaus oder höheres Gebäude",
+          "surcharge": {
+            "eur": -0.96,
+            "cents": -96
+          },
+          "conditionEn": "Building completed after 1948 and before 1999 with at least six storeys above the ground floor (E+6). The building is detached or adjoins on at least one side a building of the same construction type (which need not itself be a high-rise).",
+          "allowedYearClasses": [3, 4, 5, 6]
+        },
+        {
+          "id": "wohnblock",
+          "calculatorId": 1,
+          "label": "Wohnblock",
+          "surcharge": {
+            "eur": -1.13,
+            "cents": -113
+          },
+          "conditionEn": "Either (a) freistehender Wohnblock: detached building without elevator, with a larger green or landscaped area belonging to the building (not just a narrow strip), more than two house numbers and at most 5 storeys above the ground floor (E+5); or (b) zusammenhängender Wohnblock: building adjoining on at least one side a building of the same construction type, without elevator, with a larger green or landscaped area belonging to the building (not just a narrow strip), more than five flats (counted for the house number in which the flat is located) and at most E+5.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        },
+        {
+          "id": "anderer",
+          "calculatorId": 2,
+          "label": "Anderer Gebäudetyp",
+          "surcharge": {
+            "eur": 0.0,
+            "cents": 0
+          },
+          "conditionEn": "None of the above.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        }
+      ],
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [14]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819 page /zuschlaege table 'Gebäudetypen'",
+            "module 57158 messages.de.gebaeudetyp"
+          ]
+        }
+      }
+    },
+    "haustyp": {
+      "name": "3.3 Durch Ausstattungsmerkmale charakterisierte Haustypen",
+      "cardinality": "exactly one",
+      "definitions": {
+        "stilelemente": "The three typical Altbau style elements: (1) stucco on wall and/or ceiling (at least one place in the flat), (2) height of the largest living room above 2.90 m (in doubt the highest point of the largest living room; sloping ceilings are not considered), (3) area of the largest living room above 20 m².",
+        "dachboden": "Attic (Speicher/Dachboden) 'not or only partially converted for residential use' versus 'fully converted or not present'. A pointed roof space (Spitzboden/Dachspitz) is irrelevant.",
+        "schemaBefore1949": {
+          "attic_not_or_partially_converted": {
+            "no_style_element": "sehr_einfacher_altbau",
+            "at_least_one_style_element": "einfacher_altbau"
+          },
+          "attic_fully_converted_or_absent": {
+            "no_style_element": "einfacher_altbau",
+            "at_least_one_style_element": "guter_altbau"
+          }
+        }
+      },
+      "options": [
+        {
+          "id": "sehr_einfacher_altbau",
+          "calculatorId": 0,
+          "label": "Sehr einfacher Altbau",
+          "surcharge": {
+            "eur": -2.58,
+            "cents": -258
+          },
+          "conditionEn": "Building year before 1949; existing attic not or only partially converted for residential use; the flat has none of the three style elements (no stucco, living rooms at most 2.90 m high, largest living room at most 20 m²).",
+          "allowedYearClasses": [0, 1, 2]
+        },
+        {
+          "id": "einfacher_altbau",
+          "calculatorId": 1,
+          "label": "Einfacher Altbau",
+          "surcharge": {
+            "eur": -1.21,
+            "cents": -121
+          },
+          "conditionEn": "Building year before 1949 and either (a) attic not or only partially converted and at least one style element, or (b) attic fully converted or no attic and none of the style elements.",
+          "allowedYearClasses": [0, 1, 2]
+        },
+        {
+          "id": "guter_altbau",
+          "calculatorId": 2,
+          "label": "Guter Altbau",
+          "surcharge": {
+            "eur": 0.36,
+            "cents": 36
+          },
+          "conditionEn": "Building year before 1949; attic fully converted or no attic; at least one style element.",
+          "allowedYearClasses": [0, 1, 2]
+        },
+        {
+          "id": "einfacher_nachkriegsbau",
+          "calculatorId": 3,
+          "label": "Einfacher Nachkriegsbau",
+          "surcharge": {
+            "eur": -1.14,
+            "cents": -114
+          },
+          "conditionEn": "Building year after 1948 and before 1978 with an existing attic that is not or only partially converted for residential use.",
+          "allowedYearClasses": [3, 4]
+        },
+        {
+          "id": "anderer",
+          "calculatorId": 4,
+          "label": "Anderer Haustyp",
+          "surcharge": {
+            "eur": 0.0,
+            "cents": 0
+          },
+          "conditionEn": "Building year after 1948 and not 'Einfacher Nachkriegsbau'.",
+          "allowedYearClasses": [3, 4, 5, 6, 7, 8, 9, 10]
+        }
+      ],
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [14, 15, 16, 19]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819 page /zuschlaege table 'Haustypen' and Altbau schema",
+            "module 57158 messages.de.haustyp"
+          ]
+        }
+      }
+    },
+    "heizung": {
+      "name": "3.4 Heizung",
+      "scopeNote": "Flats without any landlord-provided heating are outside the scope of the Mietspiegel.",
+      "features": [
+        {
+          "id": "unvollstaendige_beheizung",
+          "calculatorField": "selectedUnvollstaendigBeheizung (0 = Ja, 1 = Nein)",
+          "label": "Unvollständige Beheizung",
+          "surcharge": {
+            "eur": -2.21,
+            "cents": -221
+          },
+          "conditionEn": "At least one living room has no landlord-provided heating. Only living rooms count (bath, WC, hall and (Wohn-)Küche are ignored). With more than four living rooms only the four largest are relevant.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        },
+        {
+          "id": "fussbodenheizung",
+          "calculatorField": "selectedFussbodenheizung (0 = Ja, 1 = Nein)",
+          "label": "Fußbodenheizung",
+          "surcharge": {
+            "eur": 1.0,
+            "cents": 100
+          },
+          "conditionEn": "Building year before 1999 and the flat has underfloor heating. Can be combined with 'Unvollständige Beheizung'.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6]
+        }
+      ],
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [16]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819 page /zuschlaege table 'Heizung'"
+          ]
+        }
+      }
+    },
+    "sanitaer": {
+      "name": "3.5 Sanitärbereich",
+      "cardinality": "any combination (each counts once)",
+      "perFeature": {
+        "eur": 0.62,
+        "cents": 62
+      },
+      "calculatorField": "selectedSanitaerbereich: array of ids 0..4, or [5] = 'Keine dieser Ausstattungen' (exclusive)",
+      "features": [
+        {
+          "id": "besondere_zusatzausstattung_bad",
+          "calculatorId": 0,
+          "label": "Besondere Zusatzausstattung im Bad vorhanden",
+          "conditionEn": "In addition to a bathtub there must be a separate shower and a second washbasin (or double washbasin) and/or a bidet.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        },
+        {
+          "id": "handtuchheizkoerper",
+          "calculatorId": 1,
+          "label": "Handtuchheizkörper (nicht mit Strom betrieben) vorhanden",
+          "conditionEn": "A towel radiator that is not electrically operated.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        },
+        {
+          "id": "separate_bodengleiche_dusche",
+          "calculatorId": 2,
+          "label": "Separate bodengleiche Dusche",
+          "conditionEn": "A separate floor-level (walk-in) shower.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        },
+        {
+          "id": "bad_mind_6qm_oder_zweites_bad",
+          "calculatorId": 3,
+          "label": "Fläche des (größten) Bades mindestens 6 m² und/oder zweites ausgestattetes Bad",
+          "conditionEn": "The (largest) bathroom has at least 6 m² and/or there is a second equipped bathroom (an enclosed room of the flat with at least a bathtub or shower).",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        },
+        {
+          "id": "modernisiertes_bad",
+          "calculatorId": 4,
+          "label": "Modernisiertes Bad",
+          "conditionEn": "Building year before 1999 and the bathroom was modernised or repaired in 2019 or later; the work must include at least bathtub and/or shower and wall and floor coverings.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6]
+        }
+      ],
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [16]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819 page /zuschlaege table 'Sanitärbereich'",
+            "module 57158 messages.de.sanitaerbereich"
+          ]
+        },
+        "note": "Documentation Tabelle 2.7: bad.score.25 = 0.62 per feature."
+      }
+    },
+    "kueche": {
+      "name": "3.6 Küche",
+      "note": "'Küche' means Kochnische, Wohnküche, separate kitchen or open kitchen. 'Offene Küche' and 'Küchenausstattung' can be combined.",
+      "offeneKueche": {
+        "id": "offene_kueche",
+        "calculatorField": "selectedKueche (0 = offene Küche, 1 = anderer Küchentyp)",
+        "label": "Offene Küche",
+        "surcharge": {
+          "eur": 0.55,
+          "cents": 55
+        },
+        "conditionEn": "Kitchen open to the dining/living room (functions cooking, eating, living; the kitchen area is visually and functionally clearly distinguishable from the dining/living area). Kitchen equipment is irrelevant. A cooking niche or cooking facility integrated in a living room does not qualify."
+      },
+      "kuechenausstattung": {
+        "prerequisite": {
+          "id": "kuechen_grundausstattung",
+          "calculatorField": "selectedKuechengrundausstattung (0 = Ja, 1 = Nein)",
+          "conditionEn": "Appliance surcharges may only be granted if the landlord provides a basic kitchen equipment consisting of a sink and built-in cupboards (the cupboards may also be a kitchen island/block). The basic equipment itself carries no surcharge."
+        },
+        "perAppliance": {
+          "eur": 0.53,
+          "cents": 53
+        },
+        "calculatorField": "selectedElektrogeraete: array of ids 0..2, or [3] = 'Keines dieser Elektrogeräte zusätzlich zur Grundausstattung' (exclusive)",
+        "appliances": [
+          {
+            "id": "glaskeramik_oder_induktionskochfeld",
+            "calculatorId": 0,
+            "label": "Glaskeramik-Kochmulde (Ceranfeld) oder Induktionskochfeld"
+          },
+          {
+            "id": "kuehlschrank",
+            "calculatorId": 1,
+            "label": "Kühlschrank oder Kühl-/Gefrierkombination"
+          },
+          {
+            "id": "geschirrspuelmaschine",
+            "calculatorId": 2,
+            "label": "Geschirrspülmaschine"
+          }
+        ],
+        "rule": "Each appliance provided by the landlord in addition to the basic equipment adds 0.53; a), b) and c) can be combined. Without basic equipment no appliance surcharge (the calculator refuses such a combination)."
+      },
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [17]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819 page /zuschlaege table 'Küche'",
+            "module 57158 messages.de.kueche/kuechengrundausstattung/elektrogeraete"
+          ]
+        },
+        "note": "Documentation Tabelle 2.7: Küche.offen 0.55, kue.score.23 0.53 per appliance."
+      }
+    },
+    "fussboden": {
+      "name": "3.7 Fußboden",
+      "note": "Only living rooms are considered (not bath, hall, WC, (Wohn-)Küche). With more than four living rooms only the four largest are relevant.",
+      "cardinality": "exactly one of the four floor options, plus the independent 'Modernisierter Boden' flag",
+      "options": [
+        {
+          "id": "ohne_fussbodenbelag",
+          "calculatorId": 0,
+          "label": "Ohne Fußbodenbelag",
+          "surcharge": {
+            "eur": -1.54,
+            "cents": -154
+          },
+          "conditionEn": "At least one living room has no landlord-provided floor covering."
+        },
+        {
+          "id": "einfacher_boden",
+          "calculatorId": 1,
+          "label": "Einfacher Boden",
+          "surcharge": {
+            "eur": -1.12,
+            "cents": -112
+          },
+          "conditionEn": "All living rooms have a landlord-provided floor covering and more than half of the living rooms have carpet or PVC/vinyl."
+        },
+        {
+          "id": "guter_boden",
+          "calculatorId": 2,
+          "label": "Guter Boden",
+          "surcharge": {
+            "eur": 1.37,
+            "cents": 137
+          },
+          "conditionEn": "Every living room has a landlord-provided parquet, laminate or high-quality wooden floorboards, or natural stone or tiles."
+        },
+        {
+          "id": "weder_noch",
+          "calculatorId": 3,
+          "label": "Weder 'Ohne Fußbodenbelag' noch 'Einfacher Boden' bzw. 'Guter Boden'",
+          "surcharge": {
+            "eur": 0.0,
+            "cents": 0
+          },
+          "conditionEn": "None of the three definitions applies. Further justification is possible in Table 5 item 5."
+        }
+      ],
+      "modernisierterBoden": {
+        "id": "modernisierter_boden",
+        "calculatorField": "selectedModernisierterBoden (0 = Ja, 1 = Nein)",
+        "label": "Modernisierter Boden",
+        "surcharge": {
+          "eur": 1.86,
+          "cents": 186
+        },
+        "conditionEn": "Building year before 2019 and in all living rooms the floor covering was modernised or repaired by the landlord in 2019 or later; independent of the type of floor covering.",
+        "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+        "incompatibleWith": [
+          "fussboden = ohne_fussbodenbelag"
+        ]
+      },
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [17, 18]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819 page /zuschlaege table 'Fußboden'",
+            "module 57158 messages.de.fussboden"
+          ]
+        }
+      }
+    },
+    "terrasseBalkon": {
+      "id": "terrasse_balkon",
+      "name": "3.8 Terrasse/Dachterrasse beziehungsweise Balkon/Loggia",
+      "calculatorField": "selectedTerrasseBalkon (0 = Ja, 1 = Nein)",
+      "surcharge": {
+        "eur": 0.55,
+        "cents": 55
+      },
+      "conditionEn": "Building year before 1999 and the flat has at least one terrace or roof terrace, or at least one balcony or loggia, each with an area of at least 1 m².",
+      "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6],
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [18]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819 page /zuschlaege table 'Terrasse/Dachterrasse/Balkon/Loggia'"
+          ]
+        }
+      }
+    },
+    "weitereMerkmale": {
+      "name": "3.9 Weitere Merkmale",
+      "features": [
+        {
+          "id": "besondere_ausstattung",
+          "calculatorField": "selectedBesondereAusstattung (0 = Ja, 1 = Nein)",
+          "label": "Besondere Ausstattung",
+          "surcharge": {
+            "eur": 0.77,
+            "cents": 77
+          },
+          "conditionEn": "Building (flat) with at least one of these landlord-provided features: at least one electrically operated roller shutter or blind; a video intercom.",
+          "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        },
+        {
+          "id": "modernisierte_fenster",
+          "calculatorField": "selectedModernisierteFenster (0 = Ja, 1 = Nein)",
+          "label": "Modernisierte Fenster",
+          "surcharge": {
+            "eur": 2.1,
+            "cents": 210
+          },
+          "conditionEn": "Building year before 1949; all windows were installed in 1995 or later and at least half of the windows were modernised or repaired by the landlord in 2019 or later.",
+          "allowedYearClasses": [0, 1, 2]
+        }
+      ],
+      "source": {
+        "brochure": {
+          "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+          "pages": [18]
+        },
+        "calculatorJs": {
+          "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+          "locations": [
+            "module 20819 page /zuschlaege table 'Weitere Merkmale'"
+          ]
+        }
+      }
+    }
+  },
+  "conflictRules": {
+    "description": "Combinations the calculator refuses. The UI marks them as 'Konflikt!' and blocks the calculation; the server independently returns HTTP 400 for them (verified for every rule marked 'verified400').",
+    "yearClassShorthand": {
+      "before1949": [0, 1, 2],
+      "after1948": [3, 4, 5, 6, 7, 8, 9, 10],
+      "1949to1977": [3, 4],
+      "1949to1998": [3, 4, 5, 6],
+      "before1999": [0, 1, 2, 3, 4, 5, 6],
+      "before2019": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    },
+    "rules": [
+      {
+        "id": "hochhaus_year",
+        "if": "gebaeudetyp = hochhaus",
+        "requires": "yearClass in 1949to1998",
+        "verified400": true
+      },
+      {
+        "id": "altbau_year",
+        "if": "haustyp in [sehr_einfacher_altbau, einfacher_altbau, guter_altbau]",
+        "requires": "yearClass in before1949",
+        "verified400": true
+      },
+      {
+        "id": "nachkriegsbau_year",
+        "if": "haustyp = einfacher_nachkriegsbau",
+        "requires": "yearClass in 1949to1977",
+        "verified400": true
+      },
+      {
+        "id": "anderer_haustyp_year",
+        "if": "haustyp = anderer",
+        "requires": "yearClass in after1948",
+        "verified400": true
+      },
+      {
+        "id": "fussbodenheizung_year",
+        "if": "fussbodenheizung = true",
+        "requires": "yearClass in before1999",
+        "verified400": true
+      },
+      {
+        "id": "modernisiertes_bad_year",
+        "if": "sanitaer contains modernisiertes_bad",
+        "requires": "yearClass in before1999",
+        "verified400": true
+      },
+      {
+        "id": "elektrogeraete_grundausstattung",
+        "if": "elektrogeraete not empty",
+        "requires": "kuechen_grundausstattung = true",
+        "verified400": true
+      },
+      {
+        "id": "modernisierter_boden_year",
+        "if": "modernisierter_boden = true",
+        "requires": "yearClass in before2019",
+        "verified400": true
+      },
+      {
+        "id": "modernisierter_boden_belag",
+        "if": "modernisierter_boden = true",
+        "requires": "fussboden != ohne_fussbodenbelag",
+        "verified400": true
+      },
+      {
+        "id": "terrasse_balkon_year",
+        "if": "terrasse_balkon = true",
+        "requires": "yearClass in before1999",
+        "verified400": true
+      },
+      {
+        "id": "modernisierte_fenster_year",
+        "if": "modernisierte_fenster = true",
+        "requires": "yearClass in before1949 (the UI also lists hochhaus and einfacher_nachkriegsbau as conflicts, which the year rule already implies)",
+        "verified400": true
+      },
+      {
+        "id": "rueckgebaeude_year",
+        "if": "begruendeteAbweichungen.rueckgebaeude != 0",
+        "requires": "yearClass in after1948",
+        "verified400": true
+      },
+      {
+        "id": "waermedaemmung_year",
+        "if": "begruendeteAbweichungen.waermedaemmung_aussenwaende != 0",
+        "requires": "yearClass in 1949to1998",
+        "verified400": true
+      },
+      {
+        "id": "fassade_year",
+        "if": "begruendeteAbweichungen.fassade_besonders_gestaltet != 0 or fassade_nicht_besonders_gestaltet != 0",
+        "requires": "yearClass in before1949",
+        "verified400": true
+      },
+      {
+        "id": "exclusive_none_sanitaer",
+        "if": "sanitaer 'none' (id 5) selected",
+        "requires": "no other sanitaer feature (UI enforces; server does NOT, see calculatorApi.serverQuirks)",
+        "verified400": false
+      },
+      {
+        "id": "exclusive_none_elektro",
+        "if": "elektrogeraete 'none' (id 3) selected",
+        "requires": "no other appliance (UI enforces; server does NOT)",
+        "verified400": false
+      },
+      {
+        "id": "fassade_exclusive",
+        "if": "both fassade values set",
+        "requires": "only one of fassade_besonders_gestaltet / fassade_nicht_besonders_gestaltet (they are mutually exclusive by definition; server sums both)",
+        "verified400": false
+      }
+    ],
+    "source": {
+      "calculatorJs": {
+        "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+        "locations": [
+          "module 20819: per-option 'error' predicates in the data() of each step component (Baujahr, Gebaeudetyp, Haustyp, Fussbodenheizung, Sanitaerbereich, Kuechengrundausstattung, Elektrogeraete, Fussboden, ModernisierterBoden, TerrasseBalkon, ModernisierteFenster, Abweichungen)",
+          "module 57158 messages.de.*Error texts"
+        ]
+      },
+      "note": "Server behaviour verified with POST requests on 2026-09-25."
+    }
+  },
+  "operatingCosts": {
+    "name": "Durchschnittliche Betriebskosten in Euro pro m² und Monat in München (Tabelle 1)",
+    "appliesWhen": "Only if the agreed rent is a Bruttomiete or Teilinklusivmiete (operating costs fully or partly included in the rent). Not used for a Nettomiete (the normal case: all operating costs paid separately as advance payment or lump sum).",
+    "rule": "Start from the list of all 18 cost types. Remove (strike) every type that is paid separately next to the rent (to the landlord or directly to a utility) and every type that does not arise for the flat. Add the average values of the remaining types (the ones included in the rent). Per-flat items are divided by the living area for the per-m² figure.",
+    "sumOfAllPerSqmItems": {
+      "eur": 4.24,
+      "cents": 424
+    },
+    "sumOfAllPerFlatItems": {
+      "eur": 23.98,
+      "cents": 2398
+    },
+    "items": [
+      {
+        "id": "wasser_abwasser",
+        "calculatorIndex": 0,
+        "label": "Wasser/Abwasser",
+        "amount": {
+          "eur": 0.34,
+          "cents": 34
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "strassenreinigung",
+        "calculatorIndex": 1,
+        "label": "Straßenreinigung",
+        "amount": {
+          "eur": 0.07,
+          "cents": 7
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "muellabfuhr",
+        "calculatorIndex": 2,
+        "label": "Müllabfuhr",
+        "amount": {
+          "eur": 0.21,
+          "cents": 21
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "grundsteuer",
+        "calculatorIndex": 3,
+        "label": "Grundsteuer",
+        "amount": {
+          "eur": 0.25,
+          "cents": 25
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "sach_und_haftpflichtversicherung",
+        "calculatorIndex": 4,
+        "label": "Sach- und Haftpflichtversicherung",
+        "amount": {
+          "eur": 0.28,
+          "cents": 28
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "kaminkehrer",
+        "calculatorIndex": 5,
+        "label": "Kaminkehrer*in (soweit nicht bei Heizkosten)",
+        "amount": {
+          "eur": 0.09,
+          "cents": 9
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "hausbeleuchtung",
+        "calculatorIndex": 6,
+        "label": "Hausbeleuchtung",
+        "amount": {
+          "eur": 0.1,
+          "cents": 10
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "aufzug",
+        "calculatorIndex": 7,
+        "label": "Aufzug",
+        "amount": {
+          "eur": 0.2,
+          "cents": 20
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "waschmaschine",
+        "calculatorIndex": 8,
+        "label": "Waschmaschine",
+        "amount": {
+          "eur": 0.04,
+          "cents": 4
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "hausmeister",
+        "calculatorIndex": 9,
+        "label": "Hausmeister*in",
+        "amount": {
+          "eur": 0.48,
+          "cents": 48
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "gartenpflege",
+        "calculatorIndex": 10,
+        "label": "Gartenpflege (soweit nicht bei Hausmeister*in)",
+        "amount": {
+          "eur": 0.09,
+          "cents": 9
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "hausreinigung",
+        "calculatorIndex": 11,
+        "label": "Hausreinigung (soweit nicht bei Hausmeister*in)",
+        "amount": {
+          "eur": 0.22,
+          "cents": 22
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "schneebeseitigung",
+        "calculatorIndex": 12,
+        "label": "Schneebeseitigung (soweit nicht bei Hausmeister*in)",
+        "amount": {
+          "eur": 0.05,
+          "cents": 5
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "reinigung_wartung_etagenheizung_warmwassergeraete",
+        "calculatorIndex": 13,
+        "label": "Reinigung/Wartung von Etagenheizung, Warmwasser-Geräten (soweit keine weiteren Kosten für Brennstoff abgerechnet werden)",
+        "amount": {
+          "eur": 0.22,
+          "cents": 22
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "heizung_warmwasser",
+        "calculatorIndex": 14,
+        "label": "Heizung/Warmwasser",
+        "amount": {
+          "eur": 1.6,
+          "cents": 160
+        },
+        "unit": "EUR/m²/month"
+      },
+      {
+        "id": "gemeinschaftsantenne",
+        "calculatorIndex": 15,
+        "label": "Gemeinschaftsantenne",
+        "amount": {
+          "eur": 7.33,
+          "cents": 733
+        },
+        "unit": "EUR/flat/month",
+        "perSqm": "amount / livingArea"
+      },
+      {
+        "id": "satellitenschuessel",
+        "calculatorIndex": 16,
+        "label": "Satellitenschüssel",
+        "amount": {
+          "eur": 8.48,
+          "cents": 848
+        },
+        "unit": "EUR/flat/month",
+        "perSqm": "amount / livingArea"
+      },
+      {
+        "id": "kabelfernsehen",
+        "calculatorIndex": 17,
+        "label": "Kabelfernsehen",
+        "amount": {
+          "eur": 8.17,
+          "cents": 817
+        },
+        "unit": "EUR/flat/month",
+        "perSqm": "amount / livingArea"
+      }
+    ],
+    "cableTvNote": "At the Stichmonat January 2024 passing on the costs of cable TV or a shared antenna as operating costs was permitted; since 1 July 2024 it is no longer permitted (brochure p. 8 and calculator info text).",
+    "roundingNote": "The calculator footnote warns that per-flat items (antenna, satellite, cable) can cause rounding differences in the per-m² figures and that only the monthly total should be relied upon; the monthly total adds the per-flat amounts exactly (verified).",
+    "averagesNote": "Values are averages and can differ considerably from the actual operating costs of a flat.",
+    "calculatorField": {
+      "selectedBetriebskostenA": "0 = Nettomiete (list B ignored), 1 = Bruttomiete/Teilinklusivmiete",
+      "selectedBetriebskostenB": "Array of calculatorIndex values of the cost types INCLUDED in the rent (they are added). UI default is all 18 (checked); unchecking an item (shown struck through) means it is paid separately. Verified: A=1 with B=[] adds nothing; A=1 with all 18 adds 4.24 EUR/m² plus 23.98 EUR/flat."
+    },
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [8, 9]
+      },
+      "calculatorJs": {
+        "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+        "locations": [
+          "module 57158 messages.de.betriebskosten",
+          "module 20819 Betriebskosten step (itemsA/itemsB, info text)"
+        ]
+      },
+      "note": "Documentation PDF page 28 (Abbildung 1.10): per-item arithmetic means from the survey (last available operating cost statement, converted to the Stichmonat January 2024)."
+    }
+  },
+  "range": {
+    "name": "Schwankungsbreiten der Spannen nach unten und oben (Tabelle 4)",
+    "meaning": "Two-thirds ranges (1/6 and 5/6 quantiles, quantile regression). Rents within the range still count as local comparative rents, but any deviation from the average requires a justification.",
+    "nonCentral": {
+      "wohnlageIds": [
+        "durchschnittlich",
+        "gut",
+        "beste"
+      ],
+      "calculatorIds": [0, 1, 2],
+      "down": {
+        "eur": -2.81,
+        "cents": -281
+      },
+      "up": {
+        "eur": 2.77,
+        "cents": 277
+      }
+    },
+    "central": {
+      "wohnlageIds": [
+        "zentral_durchschnittlich",
+        "zentral_gut",
+        "zentral_beste"
+      ],
+      "calculatorIds": [3, 4, 5],
+      "down": {
+        "eur": -3.71,
+        "cents": -371
+      },
+      "up": {
+        "eur": 3.8,
+        "cents": 380
+      }
+    },
+    "rule": "lower = average + down, upper = average + up (per m²); monthly values = monthly average + down*area resp. + up*area. Independent of area, year and features (Dokumentation: only the central indicator was significant; intercepts -2.81/+2.77, central shifts -0.90/+1.03).",
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [20, 23]
+      },
+      "note": "Documentation PDF pages 77-78 (Tabellen 2.10, 2.11, equation 2.13)."
+    }
+  },
+  "justifiedDeviations": {
+    "name": "Begründete Abweichungen (Tabelle 5)",
+    "legalWeight": "Orientation aid with the evidentiary quality of a simple (not qualified) Mietspiegel. Amounts are non-binding upper/lower limits: may not be exceeded (positive items) or undercut (negative items). Actual circumstances (age, quality) should guide the amount within the limit.",
+    "items": [
+      {
+        "id": "warmwasser",
+        "calculatorField": "abweichungen.wasser",
+        "number": 1,
+        "label": "Unterschiedliche oder unvollständige Warmwasserversorgung",
+        "min": {
+          "eur": -0.7,
+          "cents": -70
+        },
+        "max": {
+          "eur": 0.0,
+          "cents": 0
+        },
+        "conditionEn": "One of: (a) different hot water supply: landlord provides hot water in kitchen and bath but by different means (e.g. boiler in the kitchen, central heating system in the bathroom); (b) incomplete hot water supply: landlord-provided hot water only in kitchen or only in bath.",
+        "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      },
+      {
+        "id": "rueckgebaeude",
+        "calculatorField": "abweichungen.rueckgebaeude",
+        "number": 2,
+        "label": "Rückgebäude",
+        "min": {
+          "eur": 0.0,
+          "cents": 0
+        },
+        "max": {
+          "eur": 0.7,
+          "cents": 70
+        },
+        "conditionEn": "Flat in a rear building with building year after 1948. A rear building is an independent building with its own entrance, accessed via the main building (passage, driveway or alongside the main building); it need not be detached.",
+        "allowedYearClasses": [3, 4, 5, 6, 7, 8, 9, 10]
+      },
+      {
+        "id": "waermedaemmung_aussenwaende",
+        "calculatorField": "abweichungen.waermedaemmung",
+        "number": 3,
+        "label": "Wärmedämmung der Außenwände",
+        "min": {
+          "eur": 0.0,
+          "cents": 0
+        },
+        "max": {
+          "eur": 0.9,
+          "cents": 90
+        },
+        "conditionEn": "Building year after 1948 and before 1999; thermal insulation of some or all exterior walls since 2019 (whether modernisation or repair does not matter).",
+        "allowedYearClasses": [3, 4, 5, 6]
+      },
+      {
+        "id": "fassade_besonders_gestaltet",
+        "calculatorField": "abweichungen.fassadeA",
+        "number": "4a",
+        "label": "Besonders gestaltete Fassade",
+        "min": {
+          "eur": 0.0,
+          "cents": 0
+        },
+        "max": {
+          "eur": 0.4,
+          "cents": 40
+        },
+        "conditionEn": "Building year before 1949 with a specially designed facade (e.g. Stilfassade).",
+        "allowedYearClasses": [0, 1, 2]
+      },
+      {
+        "id": "fassade_nicht_besonders_gestaltet",
+        "calculatorField": "abweichungen.fassadeB",
+        "number": "4b",
+        "label": "Nicht besonders gestaltete Fassade",
+        "min": {
+          "eur": -0.25,
+          "cents": -25
+        },
+        "max": {
+          "eur": 0.0,
+          "cents": 0
+        },
+        "conditionEn": "Building year before 1949 without a specially designed facade.",
+        "allowedYearClasses": [0, 1, 2]
+      },
+      {
+        "id": "zusaetzliche_begruendungen",
+        "calculatorField": "abweichungen.zusatz",
+        "number": 5,
+        "label": "Zusätzliche Begründungen",
+        "min": {
+          "eur": -4.5,
+          "cents": -450
+        },
+        "max": {
+          "eur": 4.0,
+          "cents": 400
+        },
+        "limitsSource": "The min/max are the calculator's input limits (brochure: at most up to the corresponding Table 3 amounts).",
+        "conditionEn": "Possible if the flat deviates considerably from the standard of the Table 3 features, or at threshold values (e.g. a modernised bath in a 1999 building, insulation of a building from 1948 or a few years earlier). The deviation may reach at most the corresponding Table 3 amount. Other features insufficiently covered by Table 3 may be considered with special justification.",
+        "allowedYearClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      }
+    ],
+    "sumRule": "S = sum of all entered items. The result 'with justified deviations' is average + S, but S is capped to the fluctuation range of Table 4: S_capped = min(max(S, range.down), range.up). The calculator returns the uncapped S (begruendeteAbweichungenProQmTrue) and flags begruendeteAbweichungenTooHigh (S > up) / TooLow (S < down). Verified: S=+4.00 -> capped +2.77 (non-central) and +3.80 (central); S=-4.50 -> -2.81 / -3.71; S=+2.77 is not flagged.",
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [21, 22, 24]
+      },
+      "calculatorJs": {
+        "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+        "locations": [
+          "module 57158 messages.de.abweichungen (validation ranges)",
+          "module 20819 Abweichungen step checkForm()"
+        ]
+      }
+    }
+  },
+  "computation": {
+    "officialWorkSteps": [
+      {
+        "step": 1,
+        "brochure": "Arbeitsschritt 1 (p. 9, Tabelle 1)",
+        "what": "Operating costs included in the rent (only for Brutto-/Teilinklusivmiete)"
+      },
+      {
+        "step": 2,
+        "brochure": "Arbeitsschritt 2 (pp. 10-11, Tabelle 2)",
+        "what": "Grundpreis by living area row and year class"
+      },
+      {
+        "step": 3,
+        "brochure": "Arbeitsschritt 3 (pp. 12-19, Tabelle 3)",
+        "what": "Sum of surcharges and deductions (location, building/house type, equipment)"
+      },
+      {
+        "step": 4,
+        "brochure": "Arbeitsschritt 4 (p. 20, Tabelle 4)",
+        "what": "Fluctuation range by central / non-central location"
+      },
+      {
+        "step": 5,
+        "brochure": "Arbeitsschritt 5 (pp. 21-22, Tabelle 5)",
+        "what": "Justified deviations (optional)"
+      },
+      {
+        "step": 6,
+        "brochure": "Arbeitsschritt 6 (pp. 23-24, Tabellen 6a, 6b, 7)",
+        "what": "Average rent = operating costs + Grundpreis + surcharges - deductions; range; average plus capped justified deviations"
+      }
+    ],
+    "formulas": {
+      "G": "baseRent.rows[row(area)].values[yearClass]",
+      "Z": "sum of all applicable Table 3 amounts: wohnlage + gebaeudetyp + haustyp + heating features + 0.62 x number of bath features + 0.55 if open kitchen + 0.53 x number of appliances (only with basic kitchen equipment) + floor option + modernised floor + terrace/balcony + special equipment + modernised windows",
+      "BKsqm": "sum of included per-m² operating cost items (0 for Nettomiete)",
+      "BKflat": "sum of included per-flat items (antenna 7.33, satellite 8.48, cable 8.17; 0 for Nettomiete)",
+      "monthlyExact": "(G + Z + BKsqm) * area + BKflat",
+      "perSqmExact": "monthlyExact / area",
+      "rangeLowPerSqm": "perSqmExact + range.down",
+      "rangeHighPerSqm": "perSqmExact + range.up",
+      "rangeLowMonthly": "monthlyExact + range.down * area",
+      "rangeHighMonthly": "monthlyExact + range.up * area",
+      "S": "sum of justified deviations as entered (empty = 0)",
+      "Scapped": "min(max(S, range.down), range.up)",
+      "withDeviationsPerSqm": "perSqmExact + Scapped",
+      "withDeviationsMonthly": "monthlyExact + Scapped * area"
+    },
+    "arithmetic": "Exact decimal arithmetic (verified). A binary-float implementation would differ in the last cent in some cases, e.g. area 21.5 x 19.29 = 414.735 must give 414.74 (float gives 414.73), 28.31 x 16.50 = 467.115 must give 467.12.",
+    "rounding": {
+      "mode": "HALF_UP (round half away from zero), 2 decimals",
+      "when": "Only at the very end, separately for each output value, from the unrounded intermediate values. Monthly values are NOT computed from the rounded per-m² value.",
+      "evidence": [
+        "20.5 m² x 19.29 = 395.445 -> 395.45 (HALF_EVEN would give 395.44)",
+        "65.875 x 11.64 = 766.785 -> 766.79",
+        "44.25 m² with cable TV included: per m² 17.807... -> 17.81, monthly 17.45*44.25 + 15.81 = 787.9725 -> 787.97 (not 17.81*44.25 = 788.09)",
+        "deviation 0.123: per m² 11.763 -> 11.76, monthly 764.595 -> 764.60"
+      ],
+      "negativeValues": "Half-cents are rounded away from zero also for negative values (verified: deviation -0.125 -> '-0,13'; monthly -19.635 -> '-19,64'). JavaScript Math.round would give -0.12 / -19.63, so do not use it for negatives."
+    },
+    "outputFormatting": "The official API returns German-formatted strings: '.' as thousands separator, ',' as decimal separator, always 2 decimals, '-' prefix for negatives (e.g. '1.056,18', '-2,81').",
+    "areaInput": "Area is used exactly as entered (up to 3 decimals) for the monthly values; only the Grundpreis row uses ceil(area).",
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [8, 11, 20, 23, 24]
+      },
+      "calculatorJs": {
+        "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+        "locations": [
+          "module 20819 result step _callBerechnung(): POST of state.berechnung; the arithmetic itself is server-side and was reverse-engineered from 913 responses (see verification)"
+        ]
+      },
+      "note": "Rounding and arithmetic rules are not documented anywhere; they are derived from the official responses."
+    },
+    "noClamping": "Results are not clamped at zero. Extreme but valid combinations can produce negative values (verified: Wohnblock + sehr einfacher Altbau + unvollständige Beheizung + ohne Fußbodenbelag, 1930-1948, 115.5 m² gives an average of 2.33 EUR/m² and a lower range of -0.48 EUR/m²). Implementations may want to warn about such implausible results but must not alter them if they claim parity with the official calculator."
+  },
+  "calculatorApi": {
+    "endpoint": "POST https://2025.mietspiegel-muenchen.de/api/backend-service/berechnung",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "authentication": "none (session cookies are set but not required)",
+    "requestBody": {
+      "wohnflaeche": "string with '.' decimal (numbers also accepted; ',' is rejected with 400), 20..160",
+      "selectedBaujahr": "yearClasses.id 0..10",
+      "selectedWohnlage": "0..5 (wohnlage.options.calculatorId)",
+      "selectedGebaeudetyp": "0 Hochhaus, 1 Wohnblock, 2 Anderer",
+      "selectedHaustyp": "0 sehr einfacher Altbau, 1 einfacher Altbau, 2 guter Altbau, 3 einfacher Nachkriegsbau, 4 anderer",
+      "selectedUnvollstaendigBeheizung": "0 Ja, 1 Nein",
+      "selectedFussbodenheizung": "0 Ja, 1 Nein",
+      "selectedSanitaerbereich": "array of 0..4, or [5] for none",
+      "localSanitaerbereich": "UI copy of selectedSanitaerbereich (sent as the same array)",
+      "selectedKueche": "0 offene Küche, 1 anderer Küchentyp",
+      "selectedKuechengrundausstattung": "0 Ja, 1 Nein",
+      "selectedElektrogeraete": "array of 0..2, or [3] for none",
+      "localElektrogeraete": "UI copy of selectedElektrogeraete",
+      "selectedFussboden": "0 ohne Belag, 1 einfacher Boden, 2 guter Boden, 3 weder noch",
+      "selectedModernisierterBoden": "0 Ja, 1 Nein",
+      "selectedTerrasseBalkon": "0 Ja, 1 Nein",
+      "selectedBesondereAusstattung": "0 Ja, 1 Nein",
+      "selectedModernisierteFenster": "0 Ja, 1 Nein",
+      "abweichungGesetzt": "boolean (ignored by the server for the calculation)",
+      "abweichungen": "{wasser, rueckgebaeude, waermedaemmung, fassadeA, fassadeB, zusatz}: number or '' (empty)",
+      "selectedBetriebskostenA": "0 Nettomiete, 1 Brutto-/Teilinklusivmiete",
+      "selectedBetriebskostenB": "array of operating cost indexes 0..17 INCLUDED in the rent (default all 18)"
+    },
+    "responseBody": {
+      "ortsueblicheMieteProQM": "average per m²",
+      "ortsueblicheMiete": "average per month",
+      "ortsueblicheMieteSpanneUntenProQM": "lower range per m²",
+      "ortsueblicheMieteSpanneUnten": "lower range per month",
+      "ortsueblicheMieteSpanneObenProQM": "upper range per m²",
+      "ortsueblicheMieteSpanneOben": "upper range per month",
+      "ortsueblicheMieteSpanneBegruendeteAbweichungenProQM": "average plus capped justified deviations per m²",
+      "ortsueblicheMieteSpanneBegruendeteAbweichungen": "same per month",
+      "schwankungObenProQm": "range.up",
+      "schwankungUntenProQm": "range.down",
+      "begruendeteAbweichungenProQmTrue": "uncapped sum of justified deviations",
+      "begruendeteAbweichungenTooHigh": "boolean",
+      "begruendeteAbweichungenTooLow": "boolean",
+      "format": "all numeric fields are German-formatted strings (see computation.outputFormatting)"
+    },
+    "errors": {
+      "400": "invalid input (out of range values, any conflictRules violation, malformed decimal)",
+      "503": "backend error page ('Zefix!'), observed when a required field is null"
+    },
+    "serverQuirks": [
+      "Sanitär and Elektrogeräte lists: the server counts every array element except when the array is exactly the 'none' value. [0, 5] counts as 2 bath features and [0, 3] as 2 appliances. The UI never sends such lists; implementations should reject or normalise them.",
+      "fassadeA and fassadeB are both summed if both are sent (definitions are mutually exclusive).",
+      "abweichungGesetzt=false does not suppress entered deviations.",
+      "An empty selectedSanitaerbereich [] is accepted and counts as no feature (the UI requires a choice)."
+    ],
+    "otherEndpoints": {
+      "GET /api/backend-service/adresssuche?searchString=<text>": "address autocomplete, see wohnlageLookup.geocoding",
+      "GET /api/environmentInfo": "returns geokartenUrl, geokartenWohnlageUrl, geokartenGebaeudetypUrl",
+      "POST /api/backend-service/pdf": "renders the result PDF (not used here)",
+      "/api/backend-service/berechnungsvorlages*": "saved templates, requires authentication (not public)"
+    },
+    "source": {
+      "calculatorJs": {
+        "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+        "locations": [
+          "module 20819 result step: _callBerechnung() (POST /api/backend-service/berechnung), _callPdf() (POST /api/backend-service/pdf)",
+          "module 36781 Vuex modules 'berechnung' (request state) and 'ergebnis' (response fields)",
+          "module 20819 Wohnlage step search() (GET /api/backend-service/adresssuche)",
+          "module 86336 getEnvironmentInfo() (GET /api/environmentInfo)"
+        ]
+      }
+    },
+    "etiquette": "Public municipal service without published API terms. Use only for occasional verification with hypothetical data, throttle requests, never send personal data."
+  },
+  "wohnlageLookup": {
+    "officialProcess": [
+      "The calculator does NOT determine the Wohnlage automatically. In step 'Wohnlage' the user types street and house number (autocomplete via /api/backend-service/adresssuche), then opens the city map application (geokartenWohnlageUrl + address, e.g. https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Marienpl.%208).",
+      "That map (Masterportal 2.26.1, addon 'mietspiegelWohnlage') shows the raster Wohnlagenkarte with an address marker and six colour buttons. The user reads the colour at the flat and clicks the matching button.",
+      "The map window then sends window.opener.postMessage({lage: String(valueToPost), address}) to the calculator origin (https://2025.mietspiegel-muenchen.de) and closes; the calculator accepts messages from https://maps.muenchen.de or geokartenUrl and sets selectedWohnlage = parseInt(lage). The user can also pick the category manually without the map."
+    ],
+    "geocoding": {
+      "calculatorAddressSearch": {
+        "request": "GET https://2025.mietspiegel-muenchen.de/api/backend-service/adresssuche?searchString=<url-encoded text>",
+        "response": "JSON array of {label, x_koord, y_koord}; coordinates in EPSG:25832 (ETRS89 / UTM 32N), integer metres; content-type text/plain; UTF-8. Example: searchString=Marienplatz%208 -> [{\"x_koord\":691648,\"label\":\"Marienpl. 8\",\"y_koord\":5334777}]",
+        "behaviour": [
+          "The UI only queries from 3 characters (the server also answers shorter queries).",
+          "Street-only queries return one entry per house number (Leopoldstr. -> 245 entries).",
+          "'Straße'/'Str.' and case variants match; 'ss' does NOT match 'ß' (Weissenburger Str. 25 -> 0 hits, Weißenburger Str. 25 -> 1 hit).",
+          "An unknown letter suffix falls back to the base number (Leopoldstr. 10a -> 'Leopoldstr. 10'); unknown numbers return []."
+        ]
+      },
+      "mapGazetteer": "GET https://geoportal-karten-2025.muenchen.de/perl/gazetteer.pl?address=<text> returns the same structure and coordinates (ISO-8859-1).",
+      "cityAddressIndex": "The GeoPortal address index already used by munichMCP (https://geoportal.muenchen.de/search/p1_adressen_4326/_search) yields the same address points within 0.5 m after transformation to EPSG:25832 (checked for 5 addresses)."
+    },
+    "mapService": {
+      "wms": {
+        "url": "https://geoportal.muenchen.de/geoserver/soz/wms",
+        "layer": "soz:mietspiegel_2025",
+        "version": "1.3.0",
+        "alias": "https://geoportal.muenchen.de/geoserver/soz_iso/wms layer soz_iso:mietspiegel_aktuell (used by the official map; pixel-identical today, but 'aktuell' will switch to the next Mietspiegel)",
+        "crs": [
+          "EPSG:25832",
+          "CRS:84"
+        ],
+        "type": "raster image pyramid (RGB), rendered map with fills, street bands, block outlines, labels and symbols",
+        "nativeResolutionM": 0.2791214373620268,
+        "extentEPSG25832": [664000.14, 5311000.09, 713999.91, 5362999.86],
+        "getMapExample": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz:mietspiegel_2025&styles=&crs=EPSG:25832&bbox=<x-30>,<y-30>,<x+30>,<y+30>&width=215&height=215&format=image/png",
+        "getFeatureInfoExample": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetFeatureInfo&layers=soz:mietspiegel_2025&query_layers=soz:mietspiegel_2025&styles=&crs=EPSG:25832&bbox=<x-10>,<y-10>,<x+10>,<y+10>&width=101&height=101&i=50&j=50&info_format=application/json",
+        "getFeatureInfoResponse": "GeoJSON FeatureCollection with one feature whose properties are {RED_BAND, GREEN_BAND, BLUE_BAND} of the pixel; no category attribute.",
+        "legendGraphic": "GetLegendGraphic returns only a generic 20x20 raster icon; the usable legend is in the brochure p. 27 and in the map config (see portalButtonColours)."
+      },
+      "wcs": {
+        "url": "https://geoportal.muenchen.de/geoserver/soz/wcs",
+        "coverageId": "soz__mietspiegel_2025",
+        "example": "service=WCS&version=2.0.1&request=GetCoverage&coverageId=soz__mietspiegel_2025&subset=E(<x1>,<x2>)&subset=N(<y1>,<y2>)&format=image/tiff",
+        "note": "Returns a native-resolution GeoTIFF window (RGB); grid 179133 x 186298 pixels for the whole city. Same raster as the WMS."
+      },
+      "metadataRecord": "https://geoportal.muenchen.de/metadata/srv/api/records/8557f73e-f052-4d42-a321-d2f59ce5a6f6/formatters/xml",
+      "mapConfig": [
+        "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage/config.json",
+        "https://geoportal-karten-2025.muenchen.de/mietspiegel_config/services-internet.json",
+        "https://geoportal-karten-2025.muenchen.de/mastercode/2_26_1_mietspiegel_last_change_at_2022-10-31__14-22-55/js/mietspiegelWohnlage.js"
+      ]
+    },
+    "palette": [
+      {
+        "rgb": [128, 255, 255],
+        "hex": "#80FFFF",
+        "wohnlageId": "durchschnittlich",
+        "calculatorId": 0,
+        "kind": "area fill and street band"
+      },
+      {
+        "rgb": [255, 255, 0],
+        "hex": "#FFFF00",
+        "wohnlageId": "gut",
+        "calculatorId": 1,
+        "kind": "area fill and street band"
+      },
+      {
+        "rgb": [255, 127, 127],
+        "hex": "#FF7F7F",
+        "wohnlageId": "beste",
+        "calculatorId": 2,
+        "kind": "area fill"
+      },
+      {
+        "rgb": [0, 112, 255],
+        "hex": "#0070FF",
+        "wohnlageId": "zentral_durchschnittlich",
+        "calculatorId": 3,
+        "kind": "area fill"
+      },
+      {
+        "rgb": [0, 92, 230],
+        "hex": "#005CE6",
+        "wohnlageId": "zentral_durchschnittlich",
+        "calculatorId": 3,
+        "kind": "street band (Lageabstufung) drawn in a darker shade than the fill; interpretation inferred from colour family and context"
+      },
+      {
+        "rgb": [255, 178, 0],
+        "hex": "#FFB200",
+        "wohnlageId": "zentral_gut",
+        "calculatorId": 4,
+        "kind": "area fill"
+      },
+      {
+        "rgb": [255, 0, 0],
+        "hex": "#FF0000",
+        "wohnlageId": "zentral_beste",
+        "calculatorId": 5,
+        "kind": "area fill"
+      }
+    ],
+    "portalButtonColours": {
+      "note": "Colours of the six buttons in the map addon (config.json). They are NOT the raster colours for beste (#ff9999), zentral_durchschnittlich (#0066ff) and zentral_gut (#ffb300); do not use them for pixel matching.",
+      "values": {
+        "0": "#80FFFF",
+        "1": "#ffff00",
+        "2": "#ff9999",
+        "3": "#0066ff",
+        "4": "#ffb300",
+        "5": "#ff0000"
+      }
+    },
+    "otherRasterColours": [
+      {
+        "rgb": [255, 255, 255],
+        "meaning": "white: not rated (streets, squares, public/commercial or other unrated plots)"
+      },
+      {
+        "rgb": [230, 230, 230],
+        "meaning": "Grünfläche (green area), verified at Englischer Garten"
+      },
+      {
+        "rgb": [143, 143, 143],
+        "meaning": "Gewässer (water), verified at the Isar"
+      },
+      {
+        "rgb": [178, 178, 178],
+        "meaning": "grey areas, probably Gewerbefläche (inferred, not verified)"
+      },
+      {
+        "rgb": [87, 87, 87],
+        "meaning": "block and street outlines (also 86,86,86)"
+      },
+      {
+        "rgb": [0, 0, 0],
+        "meaning": "labels"
+      },
+      {
+        "rgb": [204, 102, 255],
+        "meaning": "district boundary bands and district numbers (Stadtbezirksgrenze)"
+      },
+      {
+        "rgb": [85, 255, 0],
+        "meaning": "Kennzeichnung zentraler Bereich (boundary band of the central area)"
+      },
+      {
+        "rgb": [0, 153, 255],
+        "meaning": "U-Bahn station symbol (only about 41 RGB units from the zentral_durchschnittlich fill)"
+      },
+      {
+        "rgb": [0, 204, 0],
+        "meaning": "S-Bahn station symbol"
+      }
+    ],
+    "antiAliasing": "Yes. Edges of fills against outlines, labels and white are anti-aliased (e.g. 254,254,0; 228,228,43; 195,195,62 for yellow; 228,43,43 and 154,76,76 for red). Coarser pyramid levels blend more (exact legend pixels: 53% at 0.28 m/px vs 46% at 1.4 m/px in a central test window). Nearest-colour snapping without a threshold is unsafe (U-Bahn blue would become zentral_durchschnittlich). Match only exact palette colours (optionally with a Euclidean tolerance of at most 3) and ignore everything else.",
+    "recommendedAlgorithm": [
+      "1. Geocode street + house number to EPSG:25832 (calculator adresssuche, the map gazetteer or the GeoPortal address index; prefer an exact label match).",
+      "2. Request a 60 m x 60 m window centred on the point at native resolution: WMS GetMap bbox x-30,y-30,x+30,y+30, width=height=215, format=image/png (or WCS GetCoverage GeoTIFF).",
+      "3. Classify each pixel by exact RGB match against 'palette' (7 colours, 6 categories). All other colours are unclassified.",
+      "4. The candidate category is the one of the classified pixel nearest to the centre (distance in metres). Record the distance and all other categories whose nearest pixel lies within (distance + 10 m).",
+      "5. Confidence: 'high' if the centre pixel is classified or the nearest pixel is within 5 m, with no competing category; 'medium' if within 15 m without competition; 'low' otherwise; 'none' if no classified pixel lies within 30 m (unrated area: individual assessment needed).",
+      "6. Always present the result as a proposal and link the official map (geokartenWohnlageUrl + address) for the user to confirm, because the official procedure is a visual reading and the brochure rules on street bands (first row of houses only), rear buildings and unrated areas cannot be decided from the address point alone."
+    ],
+    "samplesFile": "wohnlage-lookup-samples.json",
+    "source": {
+      "brochure": {
+        "url": "https://2025.mietspiegel-muenchen.de/broschueren/Mietspiegel_2025_Broschuere.pdf",
+        "pages": [12, 13, 27, 28]
+      },
+      "calculatorJs": {
+        "url": "https://2025.mietspiegel-muenchen.de/js/chunk-common.1a0e12fc.js",
+        "locations": [
+          "module 20819 Wohnlage step: search(), openGeoportal(), geoPostMessage() (accepts origin https://maps.muenchen.de or geokartenUrl, reads event.data.lage and event.data.address)"
+        ]
+      },
+      "other": [
+        "https://2025.mietspiegel-muenchen.de/api/environmentInfo",
+        "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage/config.json (menu.mietspiegelWohnlage.values, postMessageUrls)",
+        "https://geoportal-karten-2025.muenchen.de/mastercode/2_26_1_mietspiegel_last_change_at_2022-10-31__14-22-55/js/mietspiegelWohnlage.js (pushValuesBack)",
+        "https://geoportal-karten-2025.muenchen.de/mietspiegel_config/services-internet.json (layer mietspiegel_aktuell)",
+        "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetCapabilities",
+        "https://geoportal.muenchen.de/geoserver/soz/wcs?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=soz__mietspiegel_2025",
+        "https://geoportal.muenchen.de/metadata/srv/api/records/8557f73e-f052-4d42-a321-d2f59ce5a6f6/formatters/xml"
+      ],
+      "note": "Raster colours were measured with WMS GetMap/GetFeatureInfo on 2026-09-25 (about 75 windows)."
+    },
+    "downloadableList": "None found. There is no published street directory (Wohnlagenverzeichnis) for 2025 and no Mietspiegel or Wohnlage dataset on opendata.muenchen.de (CKAN search 'mietspiegel' and 'wohnlage': 0 results, 2026-09-25). The map exists only as raster (WMS/WCS) and in the brochure (pages 27-38, 10 sheets at 1:20000).",
+    "licenseAndTerms": {
+      "wmsMetadata": "Nutzungseinschränkung: use of the web service requires a separate agreement with the Sozialreferat der Landeshauptstadt München; terms of use referenced at https://www.muenchen.de/rathaus/Stadtverwaltung/Sozialreferat/Wohnungsamt/Mietspiegel.html; fees: 'geldleistungsfrei' (free of charge). The WMS capabilities themselves state AccessConstraints NONE (GeoServer default).",
+      "attribution": "Layer attribution in the official map: (c) LHM Sozialreferat; base maps (c) GeodatenService München.",
+      "brochureAndSite": "Impressum/brochure p. 2: all rights to the Mietspiegel, its documentation and its Internet publication (reproduction of any kind, sale and all other rights) are reserved by the Landeshauptstadt München; no claims can be derived from the content.",
+      "consequence": "Automated production use of the WMS/WCS in munichMCP should be preceded by contacting the Sozialreferat (mietberatung.soz@muenchen.de) to obtain the agreement the metadata asks for. Numeric tables in this file are facts reproduced for computation with source references; clarify redistribution with the city before publishing them."
+    }
+  },
+  "verification": {
+    "date": "2026-09-25",
+    "method": "Hypothetical flat data sent to the official calculation endpoint (913 requests, no personal data, throttled to about 1 request per second).",
+    "grundpreisCells": {
+      "checked": 770,
+      "mismatches": 0,
+      "note": "Every row x year class, using the row's upper area bound; ranges and monthly totals of all 770 responses were consistent with the formulas."
+    },
+    "targetedProbes": {
+      "count": 132,
+      "covers": "area boundaries and invalid areas, every Wohnlage, every surcharge, server-side conflicts, deviations and caps, every operating cost item, rounding edge cases including negative half-cents"
+    },
+    "testCases": {
+      "count": 10,
+      "file": "test-cases.json",
+      "status": "verified against the official endpoint"
+    },
+    "referenceModelReplay": "A reference implementation of computation.formulas and conflictRules (exact decimals, HALF_UP) reproduced every field of all 889 successful official responses exactly and rejected all 24 inputs the server refused (23 x HTTP 400, 1 x HTTP 503).",
+    "totalRequests": 913
+  }
+}

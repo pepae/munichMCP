@@ -10,7 +10,7 @@ DIR="${REMOTE_DIR:-/opt/munichmcp}"
 
 cd "$(dirname "$0")/.."
 echo "==> packing"
-tar --exclude=node_modules --exclude=data --exclude=dist --exclude=.git --exclude='*.log' --exclude=docs -czf /tmp/munichmcp.tgz .
+tar --exclude=./node_modules --exclude=./data --exclude=./dist --exclude=./.git --exclude='*.log' --exclude=./docs -czf /tmp/munichmcp.tgz .
 echo "==> uploading to $HOST:$DIR"
 ssh "$HOST" "mkdir -p $DIR/app $DIR/data && chown 1000:1000 $DIR/data"
 scp -q /tmp/munichmcp.tgz "$HOST:/tmp/munichmcp.tgz"
