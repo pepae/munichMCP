@@ -42,7 +42,7 @@ export function renderLanding(): string {
 <strong>Claude:</strong> Settings, Connectors, Add custom connector, paste the URL.<br>
 <strong>Claude Code:</strong> <code>claude mcp add --transport http munichmcp ${esc(config.publicUrl)}/mcp</code></p>
 <h2>Try asking</h2><ul>
-<li>What applies at Lindwurmstraße 50? Zoning plan, Milieuschutz, resident parking?</li>
+<li>What applies at Wörthstraße 10? Zoning plan, Milieuschutz, resident parking?</li>
 <li>When does the next U-Bahn leave from Sendlinger Tor?</li>
 <li>Is €22/m² legal for my 70 m² flat from 1965 in Haidhausen?</li>
 <li>Can I park my e-scooter at Odeonsplatz?</li>

@@ -17,7 +17,7 @@ scp -q /tmp/munichmcp.tgz "$HOST:/tmp/munichmcp.tgz"
 ssh "$HOST" bash -s <<EOF
 set -euo pipefail
 cd $DIR
-rm -rf app.new && mkdir app.new && tar -xzf /tmp/munichmcp.tgz -C app.new
+rm -rf app.new && mkdir app.new && tar --no-same-owner -xzf /tmp/munichmcp.tgz -C app.new
 rm -rf app.old && { [ -d app ] && mv app app.old || true; } && mv app.new app
 [ -f .env ] || { echo "WIKI_MAINTAINER_TOKEN=\$(openssl rand -hex 24)" > .env; chmod 600 .env; echo "created .env with a new maintainer token"; }
 cp .env app/.env
