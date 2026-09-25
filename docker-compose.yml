@@ -1,0 +1,22 @@
+services:
+  munichmcp:
+    build: .
+    image: munichmcp:latest
+    container_name: munichmcp
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8420:8420"
+    env_file:
+      - .env
+    environment:
+      PORT: "8420"
+      DATA_DIR: /data
+      PUBLIC_URL: ${PUBLIC_URL:-https://munichmcp.duckdns.org}
+    volumes:
+      - ${DATA_PATH:-../data}:/data
+    mem_limit: 768m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

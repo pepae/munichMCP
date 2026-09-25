@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>munichMCP playground</title>
+    <style>
+      :root { --bg:#fbfaf7; --fg:#1d2433; --muted:#5b6475; --line:#e4e1d8; --card:#fff; --accent:#0b5cad; }
+      @media (prefers-color-scheme: dark) { :root { --bg:#12151c; --fg:#e8eaf0; --muted:#a3abbb; --line:#2a303c; --card:#181c25; --accent:#7cb4ff; } }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+      header { padding: 14px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+      header h1 { font-size: 18px; margin: 0; }
+      header span { color: var(--muted); font-size: 13px; }
+      .wrap { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 16px; padding: 16px; }
+      @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } }
+      .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+      label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 3px; }
+      select, textarea, button { font: inherit; width: 100%; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); padding: 7px 9px; }
+      textarea { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; min-height: 150px; }
+      button { margin-top: 10px; background: var(--accent); color: #fff; border: 0; cursor: pointer; font-weight: 600; }
+      .examples button { background: transparent; color: var(--accent); border: 1px solid var(--line); font-weight: 500; text-align: left; margin-top: 6px; }
+      iframe { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--card); min-height: 120px; }
+      pre { white-space: pre-wrap; word-break: break-word; font-size: 12.5px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; max-height: 420px; overflow: auto; }
+      .muted { color: var(--muted); }
+      h2 { font-size: 14px; margin: 16px 0 6px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>munichMCP playground</h1>
+      <span>An MCP host in your browser: calls the server over MCP and renders the same MCP Apps view ChatGPT and Claude show.</span>
+    </header>
+    <div class="wrap">
+      <div class="panel">
+        <div id="status" class="muted">Connecting…</div>
+        <label for="tool">Tool</label>
+        <select id="tool"></select>
+        <div id="desc" class="muted" style="font-size:12.5px;margin-top:6px"></div>
+        <label for="args">Arguments (JSON)</label>
+        <textarea id="args">{}</textarea>
+        <button id="run">Run tool</button>
+        <h2>Examples</h2>
+        <div class="examples" id="examples"></div>
+      </div>
+      <div>
+        <iframe id="view" title="munichMCP view" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
+        <h2>Text returned to the model</h2>
+        <pre id="out" class="muted">Run a tool to see its result.</pre>
+      </div>
+    </div>
+    <script type="module" src="./playground.ts"></script>
+  </body>
+</html>

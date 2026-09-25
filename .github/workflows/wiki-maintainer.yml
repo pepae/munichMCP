@@ -1,0 +1,44 @@
+name: wiki maintainer
+
+# Weekly agent run that compiles the raw inbox into wiki pages via the
+# token-protected maintainer MCP endpoint. Inert until both secrets are set:
+#   ANTHROPIC_API_KEY, MUNICHMCP_MAINTAINER_TOKEN
+
+on:
+  schedule:
+    - cron: "0 5 * * 1" # Mondays 05:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      MUNICHMCP_MAINTAINER_TOKEN: ${{ secrets.MUNICHMCP_MAINTAINER_TOKEN }}
+      MUNICHMCP_URL: https://munichmcp.duckdns.org
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check configuration
+        id: cfg
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ] || [ -z "$MUNICHMCP_MAINTAINER_TOKEN" ]; then
+            echo "Secrets not configured; skipping."; echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.skip != 'true'
+        with:
+          node-version: 22
+      - name: Run maintainer agent
+        if: steps.cfg.outputs.skip != 'true'
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          cat > mcp.json <<EOF
+          {"mcpServers":{"munichmcp-maintainer":{"type":"http","url":"${MUNICHMCP_URL}/maintainer/mcp","headers":{"Authorization":"Bearer ${MUNICHMCP_MAINTAINER_TOKEN}"}}}}
+          EOF
+          awk 'BEGIN{c=0} /^---$/ && c<2 {c++; next} c>=2' wiki/MAINTAINER_PROMPT.md > prompt.md
+          claude -p "$(cat prompt.md)" \
+            --mcp-config mcp.json \
+            --allowedTools "mcp__munichmcp-maintainer" \
+            --model claude-sonnet-5 \
+            --max-turns 80

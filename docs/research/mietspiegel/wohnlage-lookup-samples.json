@@ -1,0 +1,395 @@
+{
+  "title": "Wohnlage lookup samples, Mietspiegel für München 2025",
+  "generated": "2026-09-25",
+  "status": "Automated readings of the official Wohnlagenkarte raster, NOT official determinations. The official calculator has no automatic lookup: the user reads the map and clicks the category (see mietspiegel-2025.json#/wohnlageLookup/officialProcess).",
+  "method": {
+    "geocoding": "GET https://2025.mietspiegel-muenchen.de/api/backend-service/adresssuche?searchString=<address>; exact label match preferred; coordinates EPSG:25832.",
+    "raster": "WMS GetMap of a 60 m x 60 m window (215 x 215 px, native 0.279 m/px) of layer soz:mietspiegel_2025 centred on the address point.",
+    "classification": "Exact RGB match against mietspiegel-2025.json#/wohnlageLookup/palette; nearest classified pixel decides; competing = other categories within nearest distance + 10 m; confidence high (<= 5 m or centre classified), medium (<= 15 m), low, none (nothing within 30 m).",
+    "addressesUsed": "Public buildings named in the brochure (Rathaus, Sozialreferat, Amt für Wohnen und Migration, Statistisches Amt, Kommunalreferat, Bauzentrum, tenant/landlord associations) and arbitrary street addresses; no personal data."
+  },
+  "wholeDatasetDownload": {
+    "available": false,
+    "note": "No street list or vector dataset is published. The only machine-readable form is the raster service (WMS https://geoportal.muenchen.de/geoserver/soz/wms layer soz:mietspiegel_2025; WCS https://geoportal.muenchen.de/geoserver/soz/wcs coverage soz__mietspiegel_2025, GeoTIFF, 179133 x 186298 px at 0.279 m). Its metadata requires a separate agreement with the Sozialreferat for use of the web service, so no raster data is stored here."
+  },
+  "samples": [
+    {
+      "query": "Marienpl. 8",
+      "matchedLabel": "Marienpl. 8",
+      "epsg25832": [691648, 5334777],
+      "wgs84": [11.576102, 48.137359],
+      "centerPixelRgb": [87, 87, 87],
+      "result": {
+        "wohnlageId": "zentral_beste",
+        "calculatorId": 5,
+        "label": "Zentrale beste Lage",
+        "distanceToNearestRatedPixelM": 2.23,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "zentral_beste": 2.23
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "zentral_beste": 1.0
+      },
+      "note": "Address point lies on a block outline (grey); nearest fill 2.2 m away. Public building (Neues Rathaus).",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=691618%2C5334747%2C691678%2C5334807&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Marienpl.%208"
+    },
+    {
+      "query": "Leopoldstr. 10",
+      "matchedLabel": "Leopoldstr. 10",
+      "epsg25832": [692146, 5336559],
+      "wgs84": [11.583594, 48.153225],
+      "centerPixelRgb": [255, 0, 0],
+      "result": {
+        "wohnlageId": "zentral_beste",
+        "calculatorId": 5,
+        "label": "Zentrale beste Lage",
+        "distanceToNearestRatedPixelM": 0.0,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "zentral_beste": 0.0
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "zentral_beste": 1.0
+      },
+      "note": null,
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=692116%2C5336529%2C692176%2C5336589&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Leopoldstr.%2010"
+    },
+    {
+      "query": "Pariser Str. 1",
+      "matchedLabel": "Pariser Str. 1",
+      "epsg25832": [693148, 5333624],
+      "wgs84": [11.595721, 48.126543],
+      "centerPixelRgb": [255, 178, 0],
+      "result": {
+        "wohnlageId": "zentral_gut",
+        "calculatorId": 4,
+        "label": "Zentrale gute Lage",
+        "distanceToNearestRatedPixelM": 0.0,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "zentral_durchschnittlich": 40.48,
+        "zentral_gut": 0.0
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "zentral_gut": 1.0
+      },
+      "note": null,
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=693118%2C5333594%2C693178%2C5333654&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Pariser%20Str.%201"
+    },
+    {
+      "query": "Franziskanerstr. 8",
+      "matchedLabel": "Franziskanerstr. 8",
+      "epsg25832": [692936, 5333723],
+      "wgs84": [11.59292, 48.127497],
+      "centerPixelRgb": [87, 87, 87],
+      "result": {
+        "wohnlageId": "zentral_gut",
+        "calculatorId": 4,
+        "label": "Zentrale gute Lage",
+        "distanceToNearestRatedPixelM": 1.63,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "zentral_gut": 1.63
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "zentral_gut": 1.0
+      },
+      "note": "Address point on a block outline; public building (Amt für Wohnen und Migration).",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=692906%2C5333693%2C692966%2C5333753&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Franziskanerstr.%208"
+    },
+    {
+      "query": "Schwanthalerstr. 68",
+      "matchedLabel": "Schwanthalerstr. 68",
+      "epsg25832": [690019, 5334765],
+      "wgs84": [11.554223, 48.13774],
+      "centerPixelRgb": [0, 112, 255],
+      "result": {
+        "wohnlageId": "zentral_durchschnittlich",
+        "calculatorId": 3,
+        "label": "Zentrale durchschnittliche Lage",
+        "distanceToNearestRatedPixelM": 0.0,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "zentral_durchschnittlich": 0.0
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "zentral_durchschnittlich": 1.0
+      },
+      "note": "Public building (Statistisches Amt).",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=689989%2C5334735%2C690049%2C5334795&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Schwanthalerstr.%2068"
+    },
+    {
+      "query": "Sonnenstr. 10",
+      "matchedLabel": "Sonnenstr. 10",
+      "epsg25832": [690772, 5334724],
+      "wgs84": [11.564316, 48.137146],
+      "centerPixelRgb": [87, 87, 87],
+      "result": {
+        "wohnlageId": "zentral_durchschnittlich",
+        "calculatorId": 3,
+        "label": "Zentrale durchschnittliche Lage",
+        "distanceToNearestRatedPixelM": 2.38,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "zentral_durchschnittlich": 2.38
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "zentral_durchschnittlich": 1.0
+      },
+      "note": "Address point on a block outline next to a street label.",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=690742%2C5334694%2C690802%2C5334754&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Sonnenstr.%2010"
+    },
+    {
+      "query": "Rosenheimer Str. 100",
+      "matchedLabel": "Rosenheimer Str. 100",
+      "epsg25832": [693337, 5333533],
+      "wgs84": [11.598217, 48.125668],
+      "centerPixelRgb": [0, 92, 230],
+      "result": {
+        "wohnlageId": "zentral_durchschnittlich",
+        "calculatorId": 3,
+        "label": "Zentrale durchschnittliche Lage",
+        "distanceToNearestRatedPixelM": 0.0,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "zentral_durchschnittlich": 0.0,
+        "zentral_gut": 13.44
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "zentral_durchschnittlich": 1.0
+      },
+      "note": "Address point on a dark-blue street band (Lageabstufung, rgb 0,92,230) inside a zentral_gut area; the orange fill is 13.4 m away. Applies to the first row of houses only (front building).",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=693307%2C5333503%2C693367%2C5333563&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Rosenheimer%20Str.%20100"
+    },
+    {
+      "query": "Emil-Dittler-Str. 1",
+      "matchedLabel": "Emil-Dittler-Str. 1",
+      "epsg25832": [688167, 5328660],
+      "wgs84": [11.526661, 48.083417],
+      "centerPixelRgb": [255, 127, 127],
+      "result": {
+        "wohnlageId": "beste",
+        "calculatorId": 2,
+        "label": "Beste Lage",
+        "distanceToNearestRatedPixelM": 0.0,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "gut": 30.12,
+        "beste": 0.0
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "beste": 1.0
+      },
+      "note": null,
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=688137%2C5328630%2C688197%2C5328690&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Emil-Dittler-Str.%201"
+    },
+    {
+      "query": "Muxelstr. 1",
+      "matchedLabel": "Muxelstr. 1",
+      "epsg25832": [687881, 5328545],
+      "wgs84": [11.522774, 48.082468],
+      "centerPixelRgb": [87, 87, 87],
+      "result": {
+        "wohnlageId": "beste",
+        "calculatorId": 2,
+        "label": "Beste Lage",
+        "distanceToNearestRatedPixelM": 0.79,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "beste": 0.79
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "beste": 1.0
+      },
+      "note": null,
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=687851%2C5328515%2C687911%2C5328575&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Muxelstr.%201"
+    },
+    {
+      "query": "Sollner Str. 1",
+      "matchedLabel": "Sollner Str. 1",
+      "epsg25832": [688291, 5328920],
+      "wgs84": [11.528439, 48.085717],
+      "centerPixelRgb": [255, 255, 0],
+      "result": {
+        "wohnlageId": "gut",
+        "calculatorId": 1,
+        "label": "Gute Lage",
+        "distanceToNearestRatedPixelM": 0.0,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "gut": 0.0
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "gut": 1.0
+      },
+      "note": null,
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=688261%2C5328890%2C688321%2C5328950&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Sollner%20Str.%201"
+    },
+    {
+      "query": "Wolfratshauser Str. 200",
+      "matchedLabel": "Wolfratshauser Str. 200",
+      "epsg25832": [688383, 5328496],
+      "wgs84": [11.529486, 48.081879],
+      "centerPixelRgb": [254, 254, 0],
+      "result": {
+        "wohnlageId": "gut",
+        "calculatorId": 1,
+        "label": "Gute Lage",
+        "distanceToNearestRatedPixelM": 0.28,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "gut": 0.28
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "gut": 1.0
+      },
+      "note": "Centre pixel is an anti-aliased yellow (254,254,0) on a yellow street band; exact yellow 0.3 m away.",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=688353%2C5328466%2C688413%2C5328526&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Wolfratshauser%20Str.%20200"
+    },
+    {
+      "query": "Blodigstr. 1",
+      "matchedLabel": "Blodigstr. 1",
+      "epsg25832": [689877, 5343200],
+      "wgs84": [11.556084, 48.213596],
+      "centerPixelRgb": [128, 255, 255],
+      "result": {
+        "wohnlageId": "durchschnittlich",
+        "calculatorId": 0,
+        "label": "Durchschnittliche Lage",
+        "distanceToNearestRatedPixelM": 0.0,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "durchschnittlich": 0.0
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "durchschnittlich": 1.0
+      },
+      "note": null,
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=689847%2C5343170%2C689907%2C5343230&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Blodigstr.%201"
+    },
+    {
+      "query": "Fürstenrieder Str. 100",
+      "matchedLabel": "Fürstenrieder Str. 100",
+      "epsg25832": [686191, 5333936],
+      "wgs84": [11.502456, 48.13142],
+      "centerPixelRgb": [128, 255, 255],
+      "result": {
+        "wohnlageId": "durchschnittlich",
+        "calculatorId": 0,
+        "label": "Durchschnittliche Lage",
+        "distanceToNearestRatedPixelM": 0.0,
+        "competingCategories": [],
+        "confidence": "high"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "durchschnittlich": 0.0,
+        "gut": 13.4
+      },
+      "shareOfRatedPixelsWithin10m": {
+        "durchschnittlich": 1.0
+      },
+      "note": "A gut area starts 13.4 m away; not within the 10 m competition margin.",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=686161%2C5333906%2C686221%2C5333966&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=F%C3%BCrstenrieder%20Str.%20100"
+    },
+    {
+      "query": "Orleanspl. 11",
+      "matchedLabel": "Orleanspl. 11",
+      "epsg25832": [693784, 5333753],
+      "wgs84": [11.604318, 48.127509],
+      "centerPixelRgb": [255, 255, 255],
+      "result": {
+        "wohnlageId": null,
+        "calculatorId": null,
+        "label": null,
+        "distanceToNearestRatedPixelM": null,
+        "competingCategories": [],
+        "confidence": "none"
+      },
+      "nearestPixelDistanceByCategoryM": {},
+      "shareOfRatedPixelsWithin10m": {},
+      "note": "No rated pixel within 30 m (white plot and a U-Bahn symbol at the point). Official office building; an individual assessment would be needed for flats here.",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=693754%2C5333723%2C693814%2C5333783&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Orleanspl.%2011"
+    },
+    {
+      "query": "Denisstr. 2",
+      "matchedLabel": "Denisstr. 2",
+      "epsg25832": [690162, 5335526],
+      "wgs84": [11.556483, 48.144537],
+      "centerPixelRgb": [255, 255, 255],
+      "result": {
+        "wohnlageId": "zentral_durchschnittlich",
+        "calculatorId": 3,
+        "label": "Zentrale durchschnittliche Lage",
+        "distanceToNearestRatedPixelM": 14.47,
+        "competingCategories": [],
+        "confidence": "medium"
+      },
+      "nearestPixelDistanceByCategoryM": {
+        "zentral_durchschnittlich": 14.47
+      },
+      "shareOfRatedPixelsWithin10m": {},
+      "note": "Address point in a white (unrated) plot; nearest rated block 14.5 m away. Office building (Kommunalreferat).",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=690132%2C5335496%2C690192%2C5335556&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Denisstr.%202"
+    },
+    {
+      "query": "Konrad-Zuse-Pl. 12",
+      "matchedLabel": "Konrad-Zuse-Pl. 12",
+      "epsg25832": [700046, 5335166],
+      "wgs84": [11.689044, 48.138271],
+      "centerPixelRgb": [255, 255, 255],
+      "result": {
+        "wohnlageId": null,
+        "calculatorId": null,
+        "label": null,
+        "distanceToNearestRatedPixelM": null,
+        "competingCategories": [],
+        "confidence": "none"
+      },
+      "nearestPixelDistanceByCategoryM": {},
+      "shareOfRatedPixelsWithin10m": {},
+      "note": "No rated pixel within 30 m (Messestadt commercial area). Office building (Bauzentrum).",
+      "getMapRequest": "https://geoportal.muenchen.de/geoserver/soz/wms?service=WMS&version=1.3.0&request=GetMap&layers=soz%3Amietspiegel_2025&styles=&crs=EPSG%3A25832&bbox=700016%2C5335136%2C700076%2C5335196&width=215&height=215&format=image%2Fpng",
+      "officialMapLink": "https://geoportal-karten-2025.muenchen.de/mietspiegel_wohnlage?query=Konrad-Zuse-Pl.%2012"
+    }
+  ]
+}

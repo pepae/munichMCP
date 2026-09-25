@@ -1,0 +1,56 @@
+{
+  "name": "munichmcp",
+  "version": "0.1.0",
+  "description": "Unofficial MCP server and MCP Apps UI for City of Munich open data",
+  "scripts": {
+    "build:ui": "node scripts/build-ui.mjs",
+    "build": "npm run build:ui && npm run build:server",
+    "start": "node dist/server.js",
+    "dev": "LAZY_DATA=1 tsx watch src/server.ts",
+    "typecheck": "tsc -p tsconfig.json && tsc -p src/ui/tsconfig.json",
+    "test": "vitest run",
+    "smoke": "tsx scripts/smoke.ts",
+    "build:server": "esbuild src/server.ts --bundle --platform=node --format=esm --packages=external --target=node22 --outfile=dist/server.js --log-level=warning",
+    "start:dev": "tsx src/server.ts"
+  },
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/client": "^2.1.0",
+    "@modelcontextprotocol/core": "^2.1.0",
+    "@modelcontextprotocol/express": "^2.0.1",
+    "@modelcontextprotocol/ext-apps": "^2.0.0",
+    "@modelcontextprotocol/node": "^2.1.0",
+    "@modelcontextprotocol/server": "^2.1.0",
+    "@turf/boolean-point-in-polygon": "^7.4.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "fast-xml-parser": "^5.11.1",
+    "hono": "^4.13.9",
+    "hyparquet": "^1.31.1",
+    "marked": "^18.0.14",
+    "minisearch": "^7.2.0",
+    "papaparse": "^5.7.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/leaflet": "^1.9.22",
+    "@types/node": "^24.13.6",
+    "@types/papaparse": "^5.5.2",
+    "dompurify": "^3.4.16",
+    "esbuild": "^0.28.2",
+    "leaflet": "^1.9.4",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1",
+    "vite-plugin-singlefile": "^2.3.3",
+    "vitest": "^5.0.2"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  }
+}

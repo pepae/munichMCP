@@ -1,0 +1,59 @@
+---
+title: "Stadtbezirk 19: Thalkirchen-Obersendling-Forstenried-Fürstenried-Solln"
+type: entity
+summary: "District 19 of Munich: key statistics, public facilities and resident-parking areas from open data."
+tags: [stadtbezirk, statistik]
+sources:
+  - https://opendata.muenchen.de/organization/statistisches-amt
+  - https://opendata.muenchen.de/dataset/vablock_stadtbezirke_opendata
+  - https://opendata.muenchen.de/dataset/opendata_ruhver_prm_gebiete_poly
+  - https://opendata.muenchen.de
+updated: 2026-09-25
+updated_by: generate-district-pages
+---
+# Stadtbezirk 19: Thalkirchen-Obersendling-Forstenried-Fürstenried-Solln
+
+Thalkirchen-Obersendling-Forstenried-Fürstenried-Solln is Munich's city district (Stadtbezirk) no. 19, home to 104,237 registered main residents on 17.8 km² (Statistisches Amt München, 2025). Its local council is the [[entities/bezirksausschuesse|Bezirksausschuss]] 19 (BA 19), which files motions to the city (see [[entities/stadtrat]]).
+
+## Key figures (2025)
+
+| Indicator | Thalkirchen-Obersendling-Forstenried-Fürstenried-Solln | Munich | Rank (highest = 1) |
+|---|---|---|---|
+| Population density (residents per km²) | 5,868 | 5,189 | 15 of 25 |
+| Average age (years) | 42.5 | 41.4 | 4 of 25 |
+| Single-person households (% of households) | 51.8 | 54.4 | 16 of 25 |
+| Residents without German citizenship (%) | 31.9 | 30.6 | 10 of 25 |
+| Cars per 1,000 residents | 455 | 471 | 8 of 25 |
+
+Source: Indikatorenatlas of the Statistisches Amt München. Ask munichMCP `district_stats` for other indicators or time series.
+
+## Public facilities in the district
+
+Counted by location from the city's open datasets (2026-09-25):
+
+| Facility | Count |
+|---|---|
+| Childcare (Kitas, Krippen, Kindergärten) | 81 |
+| Public playgrounds | 42 |
+| Public libraries (Münchner Stadtbibliothek) | 1 |
+| Drinking fountains (Trinkbrunnen) | 6 |
+| Public toilets | 18 |
+| Recycling islands (glass, cans, clothes) | 61 |
+| Recycling centres (Wertstoffhöfe) | 0 |
+| Swimming pools (M-Bäder) | 2 |
+| Markets (Wochenmärkte, Viktualienmarkt, ...) | 4 |
+| Public EV charging stations | 21 |
+| Senior service centres (Alten- und Service-Zentren) | 3 |
+| Social citizen centres (Sozialbürgerhäuser) | 1 |
+
+Use `find_nearby` with an address for the nearest ones.
+
+## Resident parking
+
+Resident-parking licence areas (Parklizenzgebiete) in operation in this district: Thalkirchen. Residents without private parking can apply for a permit; see [[topics/bewohnerparken]].
+
+## See also
+
+- [[entities/stadtbezirke|All 25 districts]]
+- [[topics/milieuschutz]] (whether an address is in a Milieuschutz area: `address_report`)
+- [[topics/mietspiegel]]
