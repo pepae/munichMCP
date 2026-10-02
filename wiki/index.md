@@ -2,17 +2,17 @@
 title: Index
 type: meta
 summary: Catalog of every page in the wiki, grouped by type.
-updated: 2026-09-25
-updated_by: build-wiki-index
+updated: 2026-10-02
+updated_by: maintainer-agent (Claude Code)
 ---
 
 # Index
 
-47 pages. Regenerated automatically; start with [[overview]].
+52 pages. Regenerated automatically; start with [[overview]].
 
 ## Overview
 
-- [[overview|Overview]]: Entry point: what this wiki is, how it stays current, and what is happening in Munich this week.
+- [[overview|Overview]]: What is going on in Munich right now, and where to start in this wiki.
 
 ## Topics
 
@@ -20,11 +20,16 @@ updated_by: build-wiki-index
 - [[topics/baden-in-der-isar|Swimming and boating in the Isar]]: Where bathing is allowed in Munich's Isar, the danger spots, flood warning levels at the Munich gauge, and how to check conditions today.
 - [[topics/bebauungsplaene|Zoning plans (Bebauungspläne)]]: What a Bebauungsplan decides, how to find the plan for an address, and what applies where there is none.
 - [[topics/bewohnerparken|Resident parking permits (Bewohnerparkausweis)]]: Who can get a resident parking permit in a Parklizenzgebiet, how to apply online, fees and exceptions.
-- [[topics/buergerversammlungen|Residents' assemblies (Bürgerversammlungen)]]: How Munich's district residents' assemblies work: agenda, Q&A hour, filing motions and voting.
+- [[topics/buergerversammlungen|Residents' assemblies (Bürgerversammlungen)]]: How Munich's district residents' assemblies work, the autumn 2026 dates, and how to file a motion and vote.
 - [[topics/e-scooter-und-sharing|E-scooters and bike sharing: where you may park and ride]]: Munich's official no-riding zones, no-parking zones, 100 m geofences and shared parking areas for e-scooters, bikes, mopeds and cargo bikes.
+- [[topics/laerm-und-hochwasser|Noise and flood risk at an address (Lärm und Hochwasser)]]: How loud an address is on the official EU noise maps, whether it lies in a flood hazard area, and how to read the numbers.
 - [[topics/mietspiegel|Mietspiegel für München 2025 (rent index)]]: What the qualified 2025 rent index is, how the comparative rent is computed, the six location classes, and caveats.
 - [[topics/milieuschutz|Milieuschutz areas (Erhaltungssatzungen)]]: What a Milieuschutz statute protects in Munich, which works need approval, and how to check an address.
+- [[topics/olympia-bewerbung|Munich's Olympic bid (Olympiabewerbung)]]: Munich is Germany's candidate for the 2036, 2040 or 2044 Summer Olympics and Paralympics: what was decided and what happens next.
 - [[topics/radverkehrsnetz|Munich's cycling network (Radverkehrsnetz)]]: The council's cycling network plan by network category (IR II to IR V), the September 2026 decision on cross-district routes, and related open data.
+- [[topics/stadthaushalt|City budget (Stadthaushalt)]]: How much Munich takes in and spends, on which services, and what the 2026 supplementary budget changed.
+- [[topics/u-bahn-sanierung-2026|U-Bahn renewal works, autumn 2026 (U-Bahn-Sanierung)]]: Which U-Bahn lines are interrupted from 5 October 2026, until when, and the best alternatives.
+- [[topics/wahlen-2026|Elections 2026 and 2025 in Munich (Wahlen)]]: Results of the 2026 city council and mayoral elections and the 2025 federal election in Munich, by district and polling precinct.
 
 ## Entities
 

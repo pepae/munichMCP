@@ -9,8 +9,12 @@ sources:
   - https://opendata.muenchen.de/dataset/opendata_ruhver_mim_geofence_poly
   - https://opendata.muenchen.de/dataset/ruhver_mim_abstellfl_ts
   - https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_ml/gbfs.json
-updated: 2026-09-25
-updated_by: maintainer-agent (initial ingest)
+  - https://risi.muenchen.de/risi/antrag/detail/10030189
+  - https://risi.muenchen.de/risi/antrag/detail/10021014
+  - https://risi.muenchen.de/risi/antrag/detail/10017980
+  - https://risi.muenchen.de/risi/antrag/detail/10017567
+updated: 2026-10-02
+updated_by: maintainer-agent
 ---
 
 # E-scooters and bike sharing
@@ -29,6 +33,16 @@ Example: at Odeonsplatz, parking shared e-scooters is prohibited; the nearest de
 ## Bike sharing
 
 Munich's nextbike system is **MyRadl** (feed `nextbike_ml`), bookable in the MVGO, MVV and nextbike apps. Its open GBFS feed (CC0) gives live bike and e-bike counts per station; `find_nearby` with category `bike_sharing` shows the nearest stations with availability.
+
+## Recent motions (Stand: 2026-10-02)
+
+Parking of shared vehicles is a recurring topic in the district committees and the council:
+
+- City councillor Laurenz Kiefer asks for better traffic safety and faster repair of defects at **MyRadl** (motion A 00216, 1 October 2026).
+- The Trudering-Riem district committee asks for measures against e-scooters parked **in underpasses and on bridges** where they obstruct people (B 00376, 24 September 2026).
+- The Ramersdorf-Perlach district committee raises **footpaths blocked by rental bikes** in Frauendreißigerstraße (B 00353) and asks for support for a **no-parking rule for e-scooters** in Adolf-Hackenberg-Straße (B 00358), both 16 September 2026.
+
+These are requests, not decisions; `council_search` shows the current state of each motion.
 
 ## Related
 

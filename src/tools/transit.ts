@@ -84,6 +84,12 @@ export function registerTransitTools(server: McpServer) {
       const [from, to] = await Promise.all([resolvePlace(a.from), resolvePlace(a.to)]);
       const r = await planTrip(from, to, { at: a.at, arriveBy: a.arrive_by, types: a.transport_types });
       if (!r.trips.length) throw new Error(`No connection found from ${from.label} to ${to.label}`);
+      // The router names the address it snapped to; show the destination the user asked for.
+      const dest = to.label.replace(/, München$/, "");
+      for (const t of r.trips) {
+        const last = t.legs.at(-1);
+        if (last?.mode === "PEDESTRIAN" && to.kind === "address") last.to = dest;
+      }
       const legTxt = (l: (typeof r.trips)[number]["legs"][number]) =>
         l.mode === "PEDESTRIAN"
           ? `walk ${l.distance_m ?? "?"} m to ${l.to}`

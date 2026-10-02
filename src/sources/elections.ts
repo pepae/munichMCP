@@ -50,8 +50,9 @@ export const ELECTIONS: ElectionDef[] = [
     precincts: "obw.stimmbezirke.stimmen.csv",
     precinctShapes: { dataset: "wahlen-stimm-und-briefwahlbezirke-in-muenchen", resource: /Kommunalwahlen 2026: Stimmbezirke/i },
     notes:
-      "Results are listed by the nominating party of each candidate. No candidate passed 50 %, so a runoff was held on 22 March 2026; its results are published at " +
-      "https://www.wahlen-muenchen.de/ergebnisse/20260322oberbuergermeisterwahl/ but not (yet) as open data, so they are not included here.",
+      "Results are listed by the nominating party of each candidate. No candidate passed 50 %, so a runoff was held on 22 March 2026. Final runoff result: " +
+      "Dominik Krause (GRÜNE) 56.3 %, Dieter Reiter (SPD) 43.7 % (https://www.wahlen-muenchen.de/ergebnisse/20260322oberbuergermeisterwahl/). " +
+      "The runoff is not on the open data portal, so its district results are not included here.",
   },
   {
     id: "bundestag_2025",
