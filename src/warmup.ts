@@ -2,6 +2,9 @@ import { DAY, HOUR } from "./lib/cache.js";
 import { sleep } from "./lib/http.js";
 import { getLayer } from "./lib/wfs.js";
 import { ADDRESS_LAYERS } from "./sources/address.js";
+import { loadBudget, populationByYear } from "./sources/budget.js";
+import { loadAssemblies } from "./sources/civic.js";
+import { warmElections } from "./sources/elections.js";
 import { ISAR_LAYERS } from "./sources/environment.js";
 import { loadServices } from "./sources/services.js";
 import { MOBILITY_LAYERS } from "./sources/mobility.js";
@@ -46,7 +49,7 @@ export async function warmUp(): Promise<void> {
 }
 
 /** Other modules register their own warm-up loaders here. */
-export const extraWarmups: (() => Promise<unknown>)[] = [loadServices];
+export const extraWarmups: (() => Promise<unknown>)[] = [loadServices, warmElections, loadBudget, populationByYear, loadAssemblies];
 
 export function scheduleRefresh(): void {
   // Roadworks change during the day; everything else daily.

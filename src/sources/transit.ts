@@ -1,8 +1,9 @@
 import { liveCache, DAY } from "../lib/cache.js";
 import { haversine, type LonLat } from "../lib/geo.js";
+import { geocode, LocationError, parseAddress } from "../lib/geocode.js";
 import { fetchJson } from "../lib/http.js";
 import { cite, type Citation } from "../lib/sources.js";
-import { stripHtml } from "../lib/text.js";
+import { fold, stripHtml } from "../lib/text.js";
 
 /**
  * Munich public transport via the (unofficial, tolerated) MVG JSON API that
@@ -63,13 +64,74 @@ const toStation = (r: RawLoc): Station => ({
   distance_m: r.distanceInMeters,
 });
 
+/** Within ~80 km of Munich: excludes same-named stops elsewhere (e.g. Nuremberg airport). */
+const inRegion = (p: LonLat) => haversine(p, { lat: 48.1374, lon: 11.5755 }) < 80_000;
+
 export async function searchStations(query: string): Promise<Station[]> {
   const q = query.trim();
   const { value } = await liveCache.get(`mvg:loc:${q.toLowerCase()}`, DAY, async () => {
     const r = await fetchJson<RawLoc[]>(`${MVG}/locations?query=${encodeURIComponent(q)}&locationTypes=STATION`, { timeoutMs: 10_000 });
-    return r.filter((x) => x.globalId).map(toStation);
+    return r.filter((x) => x.globalId).map(toStation).filter(inRegion);
   });
   return value;
+}
+
+/** All location types (stations, POIs such as "Allianz Arena", addresses) from MVG's search. */
+export async function searchLocations(query: string): Promise<(RawLoc & { type?: string })[]> {
+  const q = query.trim();
+  const { value } = await liveCache.get(`mvg:locall:${q.toLowerCase()}`, DAY, async () => {
+    const r = await fetchJson<(RawLoc & { type?: string })[]>(`${MVG}/locations?query=${encodeURIComponent(q)}`, { timeoutMs: 10_000 });
+    return r.filter((x) => typeof x.latitude === "number" && inRegion({ lat: x.latitude, lon: x.longitude }));
+  });
+  return value;
+}
+
+const norm = (s: string) => fold(s).replace(/\b(muenchen|munich|bahnhof|bf|hbf)\b/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
+
+/** Does a station/POI name answer the query? All query words must appear in the name (or vice versa). */
+export function nameMatches(query: string, name: string): boolean {
+  const q = norm(query).split(" ").filter(Boolean);
+  const n = new Set(norm(name).split(" ").filter(Boolean));
+  if (!q.length) return fold(name).includes(fold(query).trim());
+  return q.every((w) => [...n].some((t) => t.startsWith(w) || w.startsWith(t)));
+}
+
+/** Station whose name matches the query, trying the query with and without "München". */
+export async function findStationByName(query: string): Promise<Station | undefined> {
+  const variants = [...new Set([query.trim(), query.replace(/\b(m(ü|ue|u)nchen|munich)\b/gi, " ").replace(/\s+/g, " ").trim()])].filter(Boolean);
+  for (const v of variants) {
+    const r = await searchStations(v).catch(() => [] as Station[]);
+    const best = r.find((s) => nameMatches(v, s.name)) ?? r.find((s) => nameMatches(v, `${s.name} ${s.place}`));
+    if (best) return best;
+  }
+  return undefined;
+}
+
+export interface Place extends LonLat {
+  label: string;
+  kind: "station" | "poi" | "address";
+  station?: Station;
+}
+
+/**
+ * Resolve a trip end point: precise addresses via the city address index;
+ * station and venue names via MVG's own search (works across the whole MVV
+ * region, e.g. the airport); anything else via the general geocoder.
+ */
+export async function resolvePlace(text: string): Promise<Place> {
+  const t = text.trim();
+  if (parseAddress(t).number !== undefined) {
+    const hit = (await geocode(t))[0];
+    if (hit && hit.source === "city-address-index") return { lat: hit.lat, lon: hit.lon, label: hit.label, kind: "address" };
+  }
+  const st = await findStationByName(t);
+  if (st) return { lat: st.lat, lon: st.lon, label: `${st.name}${st.place && st.place !== "München" ? ` (${st.place})` : ""}`, kind: "station", station: st };
+  const pois = await searchLocations(t).catch(() => []);
+  const poi = pois.find((p) => p.type === "POI" && fold(p.name) === fold(t)) ?? pois.find((p) => p.type === "POI" && nameMatches(t, p.name));
+  if (poi) return { lat: poi.latitude, lon: poi.longitude, label: `${poi.name}${poi.place && poi.place !== "München" ? `, ${poi.place}` : ""}`, kind: "poi" };
+  const hit = (await geocode(t, { wide: true }))[0];
+  if (hit) return { lat: hit.lat, lon: hit.lon, label: hit.label, kind: hit.kind === "place" ? "poi" : "address" };
+  throw new LocationError(`Could not find "${text}" in the Munich region.`);
 }
 
 export async function nearbyStations(at: LonLat, n = 5): Promise<Station[]> {
@@ -260,22 +322,29 @@ export async function planTrip(from: LonLat, to: LonLat, opts: { at?: string; ar
 }
 
 /** Pick a station from a name, a station id, or an address/point. */
-export async function resolveStation(input: { station?: string; at?: LonLat }): Promise<Station> {
+export async function resolveStation(input: { station?: string; at?: LonLat }): Promise<Station & { alternatives?: Station[] }> {
   if (input.station && /^de:\d{5}:\d+/.test(input.station)) {
     const r = await searchStations(input.station);
     if (r[0]) return r[0];
     return { id: input.station, name: input.station, place: "", lat: 0, lon: 0, transport_types: [] };
   }
   if (input.station) {
-    const r = await searchStations(input.station);
-    const munich = r.filter((s) => s.place === "München");
-    const best = munich[0] ?? r[0];
+    const best = (await findStationByName(input.station)) ?? (await searchStations(input.station))[0];
     if (best) return best;
+    // An address or landmark passed as the station: use the stops near it.
+    const place = await resolvePlace(input.station).catch(() => undefined);
+    if (place) return resolveStation({ at: place });
     throw new Error(`No MVG/MVV station matches "${input.station}".`);
   }
   if (input.at) {
-    const r = await nearbyStations(input.at, 1);
-    if (r[0]) return r[0];
+    const r = await nearbyStations(input.at, 8);
+    if (r[0]) {
+      // People asking for "departures near X" usually mean the U-/S-Bahn or tram,
+      // not the closest bus stop: prefer rail within 700 m.
+      const rail = r.find((s) => (s.distance_m ?? 0) <= 700 && s.transport_types.some((t) => t === "UBAHN" || t === "SBAHN" || t === "TRAM"));
+      const pick = rail ?? r[0];
+      return { ...pick, alternatives: r.filter((s) => s.id !== pick.id).slice(0, 4) };
+    }
   }
   throw new Error("Give a station name (e.g. 'Sendlinger Tor') or an address.");
 }

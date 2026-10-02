@@ -171,7 +171,17 @@ export function registerRentTools(server: McpServer) {
         lines.push(`With justified deviations (${fmt(r.justified_deviations_sum!)} €/m², capped to ${fmt(r.justified_deviations_capped!)}): ${fmt(r.with_justified_deviations_per_sqm!)} €/m², ${fmt(r.with_justified_deviations_monthly)} €/month.`);
       lines.push(`Breakdown: Grundpreis ${fmt(r.grundpreis)} €/m² (row ${r.area_row}, ${r.year_class})${r.surcharges.map((s) => `; ${s.label} ${s.eur_per_sqm > 0 ? "+" : ""}${fmt(s.eur_per_sqm)}`).join("")}${r.operating_costs_per_sqm ? `; operating costs +${fmt(r.operating_costs_per_sqm)}` : ""}${r.operating_costs_per_flat ? `; per-flat operating costs +${fmt(r.operating_costs_per_flat)} €/month` : ""}.`);
       let tone: "good" | "warn" | "bad" = "good";
+      let comparison: Record<string, unknown> | undefined;
       if (a.current_rent_eur !== undefined) {
+        const d = Math.round((a.current_rent_eur - r.average_monthly) * 100) / 100;
+        comparison = {
+          your_rent_eur: a.current_rent_eur,
+          difference_to_average_eur: d,
+          difference_to_average_pct: Math.round((d / r.average_monthly) * 1000) / 10,
+          position: a.current_rent_eur > r.range_monthly.high ? "above_range" : a.current_rent_eur < r.range_monthly.low ? "below_range" : d > 0 ? "within_range_above_average" : "within_range_at_or_below_average",
+          above_upper_range_by_eur: a.current_rent_eur > r.range_monthly.high ? Math.round((a.current_rent_eur - r.range_monthly.high) * 100) / 100 : 0,
+          mietpreisbremse_note: d / r.average_monthly > 0.1 ? "More than 10 % above the comparative rent: relevant where the Mietpreisbremse (§ 556d BGB) applies to a new lease; exceptions exist." : undefined,
+        };
         const diff = a.current_rent_eur - r.average_monthly;
         const pct = (diff / r.average_monthly) * 100;
         if (a.current_rent_eur > r.range_monthly.high) tone = "bad";
@@ -186,7 +196,7 @@ export function registerRentTools(server: McpServer) {
       lines.push(`Wohnlage map for checking the class: ${mapUrl}`, `Unofficial calculation following the published method (verified against the official calculator); not legal advice. Official calculator: ${MIETSPIEGEL_META.officialCalculator}`);
       return {
         text: lines.join("\n") + citationsMd([citation]),
-        data: { input: a, result: r, wohnlage_map: mapUrl, sources: [citation] },
+        data: { input: a, result: r, comparison, wohnlage_map: mapUrl, sources: [citation] },
         view: {
           kind: "form",
           title: "Mietspiegel 2025 rent check",

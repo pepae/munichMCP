@@ -34,7 +34,7 @@ export function renderLanding(): string {
   return layout(
     "munichMCP",
     `<h1>munichMCP</h1>
-<p>An unofficial <a href="https://modelcontextprotocol.io">Model Context Protocol</a> server that gives AI assistants (ChatGPT, Claude, MUCGPT, any MCP client) live, cited access to Munich's open data: addresses and zoning, live departures, city services, the official rent index, council motions, roadworks, the Isar, micromobility rules, statistics, facilities, and an agent-maintained wiki.</p>
+<p>An unofficial <a href="https://modelcontextprotocol.io">Model Context Protocol</a> server that gives AI assistants (ChatGPT, Claude, MUCGPT, any MCP client) live, cited access to Munich's open data: addresses and zoning, noise and flood risk, live departures, city services, the official rent index, election results, the city budget, council motions and residents' assemblies, roadworks, the Isar, micromobility rules, statistics, facilities, and an agent-maintained wiki.</p>
 <div class="card"><strong>MCP endpoint</strong><pre>${esc(config.publicUrl)}/mcp</pre>
 <span class="muted">Streamable HTTP, no authentication, read-only. Interactive views via MCP Apps (maps, departure boards, rent calculator, wiki).</span></div>
 <h2>Connect</h2>

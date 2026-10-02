@@ -185,31 +185,38 @@ interface PhotonFeature {
   properties: { name?: string; street?: string; housenumber?: string; city?: string; district?: string; postcode?: string; osm_value?: string };
 }
 
-async function photon(q: string): Promise<GeocodeHit[]> {
+/** `wide`: the whole MVV region (airport, surrounding towns) instead of the city only. */
+async function photon(q: string, wide = false): Promise<GeocodeHit[]> {
+  const bbox = wide ? "10.9,47.7,12.3,48.6" : "11.36,48.06,11.73,48.25";
   const url =
-    `https://photon.komoot.io/api/?q=${encodeURIComponent(`${q} München`)}` +
-    `&lat=${MUNICH_CENTER.lat}&lon=${MUNICH_CENTER.lon}&limit=5&lang=de&bbox=11.36,48.06,11.73,48.25`;
+    `https://photon.komoot.io/api/?q=${encodeURIComponent(wide ? q : `${q} München`)}` +
+    `&lat=${MUNICH_CENTER.lat}&lon=${MUNICH_CENTER.lon}&limit=5&lang=de&bbox=${bbox}`;
   const res = await fetchJson<{ features: PhotonFeature[] }>(url, { timeoutMs: 8000 });
   return (res.features ?? [])
     .map((f) => {
       const p = f.properties;
       const [lon, lat] = f.geometry.coordinates;
       const parts = [p.name, [p.street, p.housenumber].filter(Boolean).join(" "), p.district].filter((x) => x && x.trim());
+      const inCity = withinMunich({ lon, lat }, 0);
       return {
         lon,
         lat,
-        label: `${[...new Set(parts)].join(", ")}, München`,
+        label: `${[...new Set(parts)].join(", ")}${inCity ? ", München" : p.city ? `, ${p.city}` : ""}`,
         kind: "place" as const,
         precision: "place" as const,
         source: "photon" as const,
       };
     })
-    .filter((h) => withinMunich(h));
+    .filter((h) => wide || withinMunich(h));
 }
 
-export async function geocode(query: string): Promise<GeocodeHit[]> {
+export async function geocode(query: string, opts: { wide?: boolean } = {}): Promise<GeocodeHit[]> {
   const q = query.trim();
   if (!q) return [];
+  if (opts.wide) {
+    const { value } = await liveCache.get(`geocode:wide:${q.toLowerCase()}`, DAY, () => photon(q, true).catch(() => [] as GeocodeHit[]));
+    if (value.length) return value;
+  }
   const key = `geocode:${q.toLowerCase()}`;
   const { value } = await liveCache.get(key, DAY, async () => {
     let hits: GeocodeHit[] = [];

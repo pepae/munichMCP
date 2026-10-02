@@ -1,4 +1,6 @@
+import { liveCache } from "../lib/cache.js";
 import { containsPoint, type LonLat } from "../lib/geo.js";
+import { urlExists } from "../lib/http.js";
 import { cite, type Citation } from "../lib/sources.js";
 import { featureInfo, getLayer } from "../lib/wfs.js";
 
@@ -18,11 +20,15 @@ export const ADDRESS_LAYERS = {
   tempo30: "mor_wfs:rad_rsp_tempo30zone_poly",
   pedestrianZone: "mor_wfs:rad_rsp_fussg_zone",
   chimneySweep: "rku_wfs:kehrbezirke",
+  // Open-data outline layer (dl-de/by-2.0). The richer WMS layer with PDF links
+  // requires a separate agreement with the city, so PDF links are built from the
+  // plan numbers and checked instead.
+  zoningPlans: "gsm_wfs:vagrund_baug_umgriff_opendata",
 } as const;
 
 export interface AddressFacts {
   district?: { number: string; name: string; district_part?: string; quarter?: string };
-  zoning_plans: { plan_number: string; kind: string; label?: string; plan_pdf?: string; text_pdf?: string }[];
+  zoning_plans: { plan_number: string; kind: string; note: string; plan_pdf?: string; text_pdf?: string }[];
   milieuschutz?: { area: string; valid_from?: string; map_pdf?: string; statute_pdf?: string; justification_pdf?: string };
   resident_parking?: { area: string; status?: string; measure?: string; opened?: string; enforcement?: string; details_url?: string };
   low_emission_zone?: { inside: boolean; name?: string };
@@ -34,12 +40,16 @@ export interface AddressFacts {
   citations: Citation[];
 }
 
-const PLAN_KIND: Record<string, string> = {
-  BEBPLAN: "Bebauungsplan (legally binding zoning plan)",
-  BEBPLAN_AUFST: "Bebauungsplan in Aufstellung (zoning plan in preparation)",
-  AUSSEN: "Außenbereichssatzung",
-  UMLEG: "Umlegungsgebiet (land readjustment area)",
-};
+const PLAN_PDF = (kind: "p" | "t", va: string, nr: string) => `https://www.muenchen.info/plan/bebauungsplan/${kind}_${va}_${nr}.pdf`;
+
+/** The city publishes plan drawing (p_) and text (t_) PDFs for legally binding plans; check they exist. */
+async function planPdfs(va: string, nr: string): Promise<{ plan_pdf?: string; text_pdf?: string }> {
+  const { value } = await liveCache.get(`bplan-pdf:${va}:${nr}`, 7 * 86_400_000, async () => {
+    const [p, t] = await Promise.all([urlExists(PLAN_PDF("p", va, nr)), urlExists(PLAN_PDF("t", va, nr))]);
+    return { plan_pdf: p ? PLAN_PDF("p", va, nr) : undefined, text_pdf: t ? PLAN_PDF("t", va, nr) : undefined };
+  });
+  return value;
+}
 
 async function safe<T>(label: string, errors: string[], fn: () => Promise<T>): Promise<T | undefined> {
   try {
@@ -66,7 +76,7 @@ export async function addressFacts(at: LonLat): Promise<AddressFacts> {
     safe("tempo 30", errors, () => within(ADDRESS_LAYERS.tempo30)),
     safe("pedestrian zone", errors, () => within(ADDRESS_LAYERS.pedestrianZone)),
     safe("chimney sweep", errors, () => within(ADDRESS_LAYERS.chimneySweep)),
-    safe("zoning plans", errors, () => featureInfo("plan:baug_umgriff_veredelt_in_kraft_und_aufstellung", at.lon, at.lat)),
+    safe("zoning plans", errors, () => within(ADDRESS_LAYERS.zoningPlans)),
     safe("Erhaltungssatzung", errors, () => featureInfo("plan:satz_erhalt_poly", at.lon, at.lat)),
     safe("solar potential", errors, () => featureInfo("rku:solar_gebaeudepotenzial_pv", at.lon, at.lat)),
   ]);
@@ -81,13 +91,21 @@ export async function addressFacts(at: LonLat): Promise<AddressFacts> {
           quarter: quarter?.[0]?.properties.vi_nummer,
         }
       : undefined,
-    zoning_plans: (plans ?? []).map((p) => ({
-      plan_number: String(p.nr_plan ?? p.nr ?? "?"),
-      kind: PLAN_KIND[String(p.art)] ?? String(p.art ?? "Plan"),
-      label: p.bplan_suchtext ?? undefined,
-      plan_pdf: [p.bplan_te_3, p.bplan_te_5, p.bplan_te_7].find((u) => typeof u === "string" && u.startsWith("http")),
-      text_pdf: [p.bplan_te_1, p.bplan_te_4, p.bplan_te_6, p.bplan_te_8].find((u) => typeof u === "string" && u.startsWith("http")),
-    })),
+    zoning_plans: await Promise.all(
+      (plans ?? []).map(async (f) => {
+        const nr = String(f.properties.nr_plan ?? "?");
+        const va = String(f.properties.nr_va ?? "");
+        const pdfs = va ? await planPdfs(va, nr).catch(() => ({}) as { plan_pdf?: string; text_pdf?: string }) : {};
+        return {
+          plan_number: nr,
+          kind: pdfs.plan_pdf ? "Bebauungsplan" : "Planning area without a published plan",
+          note: pdfs.plan_pdf
+            ? "Legally binding zoning plan; the plan and text PDFs are authoritative."
+            : "Bebauungsplan in preparation, Außenbereichssatzung or Umlegungsgebiet; the city publishes no plan PDF for it.",
+          ...pdfs,
+        };
+      }),
+    ),
     milieuschutz: erhalt?.[0]
       ? {
           area: String(erhalt[0].gebietname),

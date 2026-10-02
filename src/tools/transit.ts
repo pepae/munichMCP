@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { fmtDistance } from "../lib/geo.js";
-import { departures, nearbyStations, planTrip, resolveStation, TRANSPORT_TYPES, transitMessages } from "../sources/transit.js";
+import { departures, nearbyStations, planTrip, resolvePlace, resolveStation, TRANSPORT_TYPES, transitMessages } from "../sources/transit.js";
 import { locate, locationFields } from "./common.js";
 import { citationsMd, defineTool } from "./util.js";
 
@@ -31,7 +31,10 @@ export function registerTransitTools(server: McpServer) {
     async (a) => {
       const at = a.station ? undefined : await locate(a);
       const st = await resolveStation({ station: a.station, at });
-      const r = await departures(st.id, { limit: a.limit, types: a.transport_types, offsetMin: a.offset_minutes });
+      const r0 = await departures(st.id, { limit: a.limit, types: a.transport_types, offsetMin: a.offset_minutes });
+      // MVG sometimes appends a far-future trip; keep the list to what was asked for.
+      const r = { ...r0, items: r0.items.slice(0, a.limit) };
+      const { alternatives, ...station } = st;
       const lines = r.items.map(
         (d) =>
           `${berlinTime(d.expected)} (${d.in_minutes} min) ${d.line} to ${d.destination}` +
@@ -42,13 +45,14 @@ export function registerTransitTools(server: McpServer) {
         `Departures at ${st.name}${st.place && st.place !== "München" ? ` (${st.place})` : ""}${st.distance_m !== undefined && at ? `, ${fmtDistance(st.distance_m)} from ${at.label}` : ""} [${st.id}]` +
         `, as of ${berlinTime(new Date(r.fetchedAt).toISOString())}${r.stale ? " (cached, live source unavailable)" : ""}:\n` +
         (lines.join("\n") || "No departures found.") +
+        (alternatives?.length ? `\n\nOther stops nearby: ${alternatives.map((s) => `${s.name} ${fmtDistance(s.distance_m ?? 0)} (${s.transport_types.map((t) => TYPE_LABEL[t] ?? t).join(", ")})`).join("; ")}` : "") +
         citationsMd([r.citation, at?.citation]);
       return {
         text,
-        data: { station: st, fetched_at: new Date(r.fetchedAt).toISOString(), departures: r.items, sources: [r.citation] },
+        data: { station, other_stops_nearby: alternatives, fetched_at: new Date(r.fetchedAt).toISOString(), departures: r.items, sources: [r.citation] },
         view: {
           kind: "departures",
-          station: st,
+          station,
           fetched_at: new Date(r.fetchedAt).toISOString(),
           departures: r.items,
           refresh: { tool: "departures", arguments: { station: st.id, transport_types: a.transport_types, limit: a.limit, offset_minutes: a.offset_minutes } },
@@ -77,7 +81,7 @@ export function registerTransitTools(server: McpServer) {
       invoking: "Planning your trip…",
     },
     async (a) => {
-      const [from, to] = await Promise.all([locate({ address: a.from }), locate({ address: a.to })]);
+      const [from, to] = await Promise.all([resolvePlace(a.from), resolvePlace(a.to)]);
       const r = await planTrip(from, to, { at: a.at, arriveBy: a.arrive_by, types: a.transport_types });
       if (!r.trips.length) throw new Error(`No connection found from ${from.label} to ${to.label}`);
       const legTxt = (l: (typeof r.trips)[number]["legs"][number]) =>
@@ -90,7 +94,7 @@ export function registerTransitTools(server: McpServer) {
         r.trips
           .map((t, i) => `${i + 1}. ${berlinTime(t.departure)} to ${berlinTime(t.arrival)} (${t.duration_min} min, ${t.changes} change${t.changes === 1 ? "" : "s"}, ${t.walking_m} m walking, zone ${t.zones.join("/") || "?"})\n   ${t.legs.map(legTxt).join("\n   ")}`)
           .join("\n\n") +
-        citationsMd([r.citation, from.citation]);
+        citationsMd([r.citation]);
       const best = r.trips[0];
       const COLORS: Record<string, string> = { UBAHN: "#0065ae", SBAHN: "#408335", TRAM: "#d82020", BUS: "#00586a", REGIONAL_BUS: "#00586a", PEDESTRIAN: "#868e96", BAHN: "#555555" };
       return {

@@ -69,9 +69,10 @@ function fromCsv(
   category: string,
   dataset: string,
   map: (r: Record<string, string>) => { name?: string; lat?: unknown; lon?: unknown; address?: string; url?: string; details: Record<string, unknown> } | null,
+  nameFilter?: RegExp,
 ) {
   return async () => {
-    const { rows, fetchedAt } = await datasetCsv(dataset, { maxAgeMs: DAY });
+    const { rows, fetchedAt } = await datasetCsv(dataset, { maxAgeMs: DAY, nameFilter });
     const items: Place[] = [];
     rows.forEach((r, i) => {
       const m = map(r);
@@ -224,6 +225,15 @@ export const CATEGORIES: CategoryDef[] = [
       lat: r.latitude, lon: r.longitude, address: addr(r.strasse, r.hausnummer), url: r.webseite,
       details: { weekday: r.wochentag, time: `${r.uhrzeit_start}-${r.uhrzeit_ende}`, venue: r.schulnamen, hall: r["hn-zusatz"], info: r.zusatzinfomationen },
     })),
+  },
+  {
+    id: "public_wifi", label: "Free public Wi-Fi (M-WLAN hotspots on public squares, city list of Oct 2023)", group: "everyday", source: "places", dataset: "wlan-standorte-lhm-muenchen",
+    load: fromCsv(
+      "public_wifi",
+      "wlan-standorte-lhm-muenchen",
+      (r) => ({ name: `M-WLAN ${clean(r.adresse) ?? ""}`.trim(), lat: r.latitude, lon: r.longitude, address: r.adresse, details: { type: r.typ, access_points: r.anzahl } }),
+      /ffentliche Pl/i,
+    ),
   },
   {
     id: "bike_sharing", label: "MVG Rad / MyRadl bike-sharing stations (live availability)", group: "mobility", source: "bikeSharing", dataset: "gbfs-nextbike_ml",

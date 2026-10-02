@@ -4,13 +4,29 @@ import { geocode } from "../lib/geocode.js";
 import { fmtDistance } from "../lib/geo.js";
 import { cite } from "../lib/sources.js";
 import { addressFacts } from "../sources/address.js";
+import { districtNames, electionCitation, loadElection } from "../sources/elections.js";
 import { wohnlageAt, wohnlageMapUrl } from "../sources/mietspiegel.js";
 import { mobilityRulesAt } from "../sources/mobility.js";
 import { findNearby } from "../sources/places.js";
 import { roadworksNear } from "../sources/roadworks.js";
+import { floodAt, noiseAt, type NoiseValue } from "../sources/risks.js";
 import { nearbyStations } from "../sources/transit.js";
 import { locate, locationFields, locationLine } from "./common.js";
 import { citationsMd, defineTool } from "./util.js";
+
+const noiseText = (v: NoiseValue) => (v.db !== null ? `${v.db.toFixed(1)} dB(A)` : (v.band ?? "below mapping threshold"));
+
+/** One line per noise source with a mapped level, e.g. "road traffic 76.5 dB(A) Lden / 69.8 dB(A) Lnight". */
+export function noiseLines(values: NoiseValue[]): string[] {
+  const out: string[] = [];
+  for (const src of [...new Set(values.map((v) => v.source))]) {
+    const day = values.find((v) => v.source === src && v.metric === "Lden");
+    const night = values.find((v) => v.source === src && v.metric === "Lnight");
+    if (!day?.band && !night?.band) continue;
+    out.push(`${src} ${day?.band ? noiseText(day) : "under 55 dB(A)"} Lden${night ? ` / ${night.band ? noiseText(night) : "under 50 dB(A)"} Lnight` : ""}`);
+  }
+  return out;
+}
 
 export function registerAddressTools(server: McpServer) {
   defineTool(
@@ -41,7 +57,8 @@ export function registerAddressTools(server: McpServer) {
       description:
         "One-call civic report for an address in Munich from official city geodata: district (Stadtbezirk, Bezirksteil), legally binding zoning plans (Bebauungsplan, with PDF links), " +
         "Milieuschutz / Erhaltungssatzung area, residential location class of the Mietspiegel 2025, resident-parking licence area, low-emission zone, Tempo-30 zone, chimney-sweep district, " +
-        "rooftop solar potential, roadworks and no-parking restrictions nearby, e-scooter parking rules, nearest public transport stops and everyday facilities. Shows a map.",
+        "rooftop solar potential, environmental noise (road, tram/U-Bahn, industry; EU noise maps 2022) and river flood risk (LfU), the local result of the 2026 city council election, " +
+        "roadworks and no-parking restrictions nearby, e-scooter parking rules, nearest public transport stops and everyday facilities. Shows a map.",
       input: z.object({ ...locationFields }),
       ui: true,
       invoking: "Querying city geodata…",
@@ -49,7 +66,7 @@ export function registerAddressTools(server: McpServer) {
     },
     async (a) => {
       const loc = await locate(a);
-      const [facts, wohnlage, stations, works, mob, fountain, toilet, playground, glass, kitas, library] = await Promise.all([
+      const [facts, wohnlage, stations, works, mob, fountain, toilet, playground, glass, kitas, library, noise, flood, vote] = await Promise.all([
         addressFacts(loc),
         wohnlageAt(loc).catch(() => undefined),
         nearbyStations(loc, 4).catch(() => undefined),
@@ -61,13 +78,22 @@ export function registerAddressTools(server: McpServer) {
         findNearby("glass_container", loc, { limit: 1, radiusM: 3000 }).catch(() => undefined),
         findNearby("kita", loc, { limit: 3, radiusM: 500 }).catch(() => undefined),
         findNearby("library", loc, { limit: 1, radiusM: 5000 }).catch(() => undefined),
+        noiseAt(loc).catch(() => undefined),
+        floodAt(loc).catch(() => undefined),
+        loadElection("stadtrat_2026").catch(() => undefined),
       ]);
+      const names = vote ? await districtNames().catch(() => ({}) as Record<string, string>) : {};
+      const local = vote && facts.district ? vote.districts.get(facts.district.number.padStart(2, "0")) : undefined;
 
       const L: string[] = [];
       L.push(`Address report for ${loc.label}`, locationLine(loc), "");
       if (facts.district) L.push(`District: ${facts.district.number} ${facts.district.name}${facts.district.district_part ? `, Bezirksteil ${facts.district.district_part}` : ""}${facts.district.quarter ? `, Viertel ${facts.district.quarter}` : ""}`);
       if (facts.zoning_plans.length)
-        L.push(`Zoning: ${facts.zoning_plans.map((p) => `${p.kind} Nr. ${p.plan_number}${p.plan_pdf ? ` (plan: ${p.plan_pdf}${p.text_pdf ? `, text: ${p.text_pdf}` : ""})` : ""}`).join("; ")}`);
+        L.push(
+          `Zoning: ${facts.zoning_plans
+            .map((p) => (p.plan_pdf ? `Bebauungsplan Nr. ${p.plan_number}, legally binding (plan: ${p.plan_pdf}${p.text_pdf ? `, text: ${p.text_pdf}` : ""})` : `planning area Nr. ${p.plan_number} without a published plan (${p.note.split(";")[0]})`))
+            .join("; ")}`,
+        );
       else L.push("Zoning: no Bebauungsplan covers this point (in built-up areas, projects are then usually assessed under §34 BauGB: they must fit into the surroundings).");
       L.push(
         facts.milieuschutz
@@ -87,6 +113,15 @@ export function registerAddressTools(server: McpServer) {
       if (facts.chimney_sweep_district) L.push(`Chimney-sweep district (Kehrbezirk): ${facts.chimney_sweep_district}`);
       if (facts.solar_potential?.length)
         L.push(`Rooftop solar (city solar atlas): ${facts.solar_potential.map((s) => `${s.roof_kwp} kWp, ~${s.yield_kwh_per_year.toLocaleString("en")} kWh/year${s.monument_protection ? ` (${s.monument_protection})` : ""}`).join("; ")}`);
+      if (noise) {
+        const lines = noiseLines(noise.values);
+        L.push(lines.length ? `Noise (EU noise maps 2022, loudest side within 40 m): ${lines.join("; ")}. ${noise.verdict}` : `Noise (EU noise maps 2022): ${noise.verdict}`);
+      }
+      if (flood) L.push(`River flood risk: ${flood.verdict}${flood.hits.length ? ` Mapped: ${flood.hits.map((h) => h.label + (h.water ? ` (${h.water})` : "")).join("; ")}.` : ""}`);
+      if (local) {
+        const top3 = local.parties.filter((p) => p.pct !== null).slice(0, 3);
+        L.push(`City council election 2026 in district ${facts.district!.number} ${names[facts.district!.number.padStart(2, "0")] ?? ""}: ${top3.map((p) => `${p.party} ${p.pct!.toFixed(1)} %`).join(", ")}; turnout ${local.turnout_pct?.toFixed(1)} % (election_results has precinct-level detail).`);
+      }
       if (stations?.length) L.push(`Nearest stops: ${stations.map((s) => `${s.name} ${fmtDistance(s.distance_m ?? 0)} (${s.transport_types.join(", ")})`).join("; ")}`);
       if (works) {
         const act = works.items.filter((w) => w.active_on_date);
@@ -98,24 +133,37 @@ export function registerAddressTools(server: McpServer) {
       if (kitas) L.push(`Childcare within 500 m: ${kitas.total_in_radius} facilities${kitas.items.length ? ` (nearest: ${kitas.items.map((k) => k.name).join(", ")})` : ""}`);
       if (facts.errors.length) L.push("", `Some layers could not be queried: ${facts.errors.join("; ")}`);
 
-      const cits = [...facts.citations, loc.citation, wohnlage?.citation, works?.citation, mob?.citation, fountain?.citation, kitas?.citation];
+      const cits = [...facts.citations, loc.citation, wohnlage?.citation, noise?.citation, flood?.citation, vote ? electionCitation(vote.fetchedAt) : undefined, works?.citation, mob?.citation, fountain?.citation, kitas?.citation];
       const markers = [
         ...(stations ?? []).map((s) => ({ lat: s.lat, lon: s.lon, label: s.name, sublabel: `${s.transport_types.join(", ")} · ${fmtDistance(s.distance_m ?? 0)}`, color: "#1864ab" })),
         ...[fountain, toilet, playground, glass, library, kitas].flatMap((n) => (n?.items ?? []).map((p) => ({ lat: p.lat, lon: p.lon, label: p.name, sublabel: `${n!.label.split(" (")[0]} · ${fmtDistance(p.distance_m)}`, color: "#2b8a3e" }))),
       ];
       const cards = [
         facts.district && { title: "District", lines: [`${facts.district.number} ${facts.district.name}`, facts.district.district_part ? `Bezirksteil ${facts.district.district_part}` : ""] },
-        { title: "Zoning plan", lines: facts.zoning_plans.length ? facts.zoning_plans.map((p) => `${p.kind.split(" (")[0]} ${p.plan_number}`) : ["None (§34 BauGB)"], links: facts.zoning_plans.flatMap((p) => [p.plan_pdf && { label: `Plan ${p.plan_number}`, href: p.plan_pdf }, p.text_pdf && { label: `Text ${p.plan_number}`, href: p.text_pdf }]).filter(Boolean) },
+        { title: "Zoning plan", lines: facts.zoning_plans.length ? facts.zoning_plans.map((p) => (p.plan_pdf ? `Bebauungsplan ${p.plan_number}` : `Planning area ${p.plan_number} (no plan)`)) : ["None (§34 BauGB)"], links: facts.zoning_plans.flatMap((p) => [p.plan_pdf && { label: `Plan ${p.plan_number}`, href: p.plan_pdf }, p.text_pdf && { label: `Text ${p.plan_number}`, href: p.text_pdf }]).filter(Boolean) },
         { title: "Milieuschutz", tone: facts.milieuschutz ? "warn" : undefined, lines: [facts.milieuschutz ? `Yes: ${facts.milieuschutz.area}` : "No"], links: facts.milieuschutz?.statute_pdf ? [{ label: "Statute", href: facts.milieuschutz.statute_pdf }] : [] },
         wohnlage && { title: "Mietspiegel location", lines: [wohnlage.label] },
         { title: "Resident parking", lines: [facts.resident_parking ? facts.resident_parking.area : "No licence area"] },
         facts.solar_potential?.[0] && { title: "Rooftop solar", lines: [`${facts.solar_potential[0].roof_kwp} kWp`, `~${facts.solar_potential[0].yield_kwh_per_year.toLocaleString("en")} kWh/yr`] },
+        noise && {
+          title: "Noise (Lden / Lnight)",
+          tone: /^(Very loud|Loud)/.test(noise.verdict) ? "warn" : undefined,
+          lines: noiseLines(noise.values).length ? noiseLines(noise.values).map((l) => l.replace(" Lden", "").replace(" Lnight", "")) : ["Below mapping threshold"],
+        },
+        flood && { title: "Flood risk", tone: flood.hits.some((h) => h.id !== "hq_extrem") ? "warn" : undefined, lines: [flood.hits.length ? flood.verdict.split(":")[0] : "Outside flood areas"] },
         mob && { title: "E-scooter parking", tone: mob.escooter.parking_prohibited.length || mob.escooter.must_use_designated_area ? "bad" : "good", lines: [mob.escooter.parking_prohibited.length ? "Prohibited here" : mob.escooter.must_use_designated_area ? "Use the nearby parking area" : mob.escooter.on_designated_area ? "Designated area" : "Not a no-parking zone"] },
       ].filter(Boolean);
 
       return {
         text: L.join("\n") + citationsMd(cits),
-        data: { location: loc, facts, wohnlage, nearest_stops: stations, roadworks_today: works?.items.filter((w) => w.active_on_date), escooter: mob?.escooter.verdict, nearby: { fountain: fountain?.items[0], toilet: toilet?.items[0], playground: playground?.items[0], glass_container: glass?.items[0], library: library?.items[0], kitas_500m: kitas?.total_in_radius }, sources: cits.filter(Boolean) },
+        data: {
+          location: loc,
+          facts,
+          wohnlage,
+          noise: noise ? { verdict: noise.verdict, levels: noise.values.filter((v) => v.band) } : undefined,
+          flood: flood ? { verdict: flood.verdict, mapped: flood.hits } : undefined,
+          council_election_2026_district: local ? { turnout_pct: local.turnout_pct, top: local.parties.slice(0, 5) } : undefined,
+          nearest_stops: stations, roadworks_today: works?.items.filter((w) => w.active_on_date), escooter: mob?.escooter.verdict, nearby: { fountain: fountain?.items[0], toilet: toilet?.items[0], playground: playground?.items[0], glass_container: glass?.items[0], library: library?.items[0], kitas_500m: kitas?.total_in_radius }, sources: cits.filter(Boolean) },
         view: { kind: "map", title: "Address report", subtitle: loc.label, center: loc, zoom: 16, origin: { lat: loc.lat, lon: loc.lon, label: loc.label }, cards, markers, attribution: "Landeshauptstadt München" },
       };
     },

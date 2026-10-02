@@ -47,7 +47,8 @@ export function registerServiceTools(server: McpServer) {
       const body = a.content.length > 14_000 ? `${a.content.slice(0, 14_000)}\n\n[truncated, see ${a.url}]` : a.content;
       return {
         text: `${body}\n\nOfficial page: ${a.url}${a.last_modified ? ` (last modified ${a.last_modified})` : ""}` + citationsMd([r.citation]),
-        data: { id: a.id, name: a.name, url: a.url, language: a.language, last_modified: a.last_modified, keywords: a.keywords, sources: [r.citation] },
+        data: { id: a.id, name: a.name, url: a.url, language: a.language, last_modified: a.last_modified, content: body, sources: [r.citation] },
+        summary: false,
       };
     },
   );

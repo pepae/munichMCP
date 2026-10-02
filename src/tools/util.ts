@@ -14,6 +14,18 @@ export interface ToolOutput {
   data?: Record<string, unknown>;
   /** View-only payload (geometry etc.), delivered in _meta so it stays out of model context. */
   view?: Record<string, unknown>;
+  /**
+   * Some hosts give the model only `structuredContent`, so by default the
+   * Markdown text (minus the sources block) is also embedded there as
+   * `summary`. Set false when `data` already carries the full text.
+   */
+  summary?: false;
+}
+
+/** Drop the trailing "Sources:" block (sources are structured in data.sources). */
+export function withoutSources(text: string): string {
+  const i = text.lastIndexOf("\n\nSources:\n");
+  return i >= 0 ? text.slice(0, i) : text;
 }
 
 export function citationsMd(cs: (Citation | undefined)[]): string {
@@ -73,9 +85,14 @@ export function defineTool<S extends z.ZodObject>(
     try {
       const out = await handler(args);
       console.log(`[tool] ${name} ok ${Date.now() - started}ms`);
+      const structured = out.data
+        ? out.summary === false
+          ? out.data
+          : { summary: "sources" in out.data ? withoutSources(out.text) : out.text, ...out.data }
+        : undefined;
       return {
         content: [{ type: "text", text: out.text }],
-        ...(out.data ? { structuredContent: out.data } : {}),
+        ...(structured ? { structuredContent: structured } : {}),
         ...(out.view ? { _meta: { "munichmcp/view": out.view } } : {}),
       };
     } catch (err) {

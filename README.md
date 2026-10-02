@@ -10,9 +10,13 @@ An **unofficial** [Model Context Protocol](https://modelcontextprotocol.io) serv
 
 | Tool | What it does | Main sources |
 |---|---|---|
-| `address_report` | Everything that applies at an address: district, zoning plans (with PDFs), Milieuschutz, resident-parking area, low-emission zone, chimney-sweep district, rooftop solar, roadworks, e-scooter rules, nearest stops and facilities | GeoPortal WFS/WMS, city address index |
+| `address_report` | Everything that applies at an address: district, zoning plans (with PDFs), Milieuschutz, resident-parking area, low-emission zone, chimney-sweep district, rooftop solar, noise, flood risk, local election result, roadworks, e-scooter rules, nearest stops and facilities | GeoPortal WFS/WMS, city address index, LfU, Wahlamt |
+| `noise_and_flood` | Road, tram/U-Bahn and industrial noise (Lden and Lnight in dB(A), EU noise maps 2022) and river flood hazard (frequent, 100-year, extreme, designated zones), with the official maps as switchable map layers | Bavarian Environment Agency (LfU), CC BY 4.0 |
+| `election_results` | City council and mayoral election 2026, federal election 2025: city, district, polling precinct (from an address) and constituency, or one party across all districts | Wahlamt, dl-de/by-2.0 |
+| `city_budget` | Income and expenses of about 200 city services, per department and year since 2018, with cost per resident | Stadtkämmerei, Statistisches Amt |
+| `citizens_assemblies` | Dates and venues of the district residents' assemblies (Bürgerversammlungen), from an address or district | Direktorium, open data |
 | `find_address` | Geocoding with the city's official address index (162k addresses) | GeoPortal search, Photon fallback |
-| `find_nearby` | 29 categories of official facilities (drinking fountains, toilets, playgrounds, Kitas, libraries, pools, P+R, EV charging, recycling, live MyRadl bikes, ...) | open data portal, GBFS |
+| `find_nearby` | 30 categories of official facilities (drinking fountains, toilets, playgrounds, Kitas, libraries, pools, public Wi-Fi, P+R, EV charging, recycling, live MyRadl bikes, ...) | open data portal, GBFS |
 | `roadworks_near` | Construction sites and temporary no-parking zones for the next 4 weeks | Mobilitätsreferat |
 | `mobility_rules_at` | E-scooter no-riding / no-parking zones, 100 m geofences, designated sharing areas | Mobilitätsreferat |
 | `damage_reports_near` | Citizen reports (street lights, potholes, ...) near an address | machmuenchenbesser.de Open311 (CC0) |
@@ -23,12 +27,18 @@ An **unofficial** [Model Context Protocol](https://modelcontextprotocol.io) serv
 | `isar_conditions` | Isar level, discharge, water temperature, flood class, bathing zones, danger spots | HND/GKD, LHP, city |
 | `weather_air_pollen` | DWD weather and warnings, UBA air quality, DWD pollen | Bright Sky, UBA, DWD |
 | `find_statistics`, `district_stats` | ~100 official statistics datasets by district and month | Statistisches Amt |
-| `wiki_search`, `wiki_read`, `wiki_index` | Agent-maintained, cross-linked knowledge base | the 11th source, see below |
+| `wiki_search`, `wiki_read`, `wiki_index` | Agent-maintained, cross-linked knowledge base | see below |
 | `about_munichmcp` | Sources, licences, caveats | |
 
 Every result names its sources with licence and retrieval time. See `wiki/sources/open-data-landschaft.md` for the full licence analysis, including what is deliberately **not** used.
 
-## The wiki (the 11th source)
+**Questions to try:** [docs/demo-questions.md](docs/demo-questions.md) lists what flat hunters, newcomers, commuters, journalists and city staff ask, and which tools answer it.
+
+### What the city could open next
+
+Some of the most useful data is published but not under an open licence, so munichMCP does not use it: primary school catchment areas (Grundschulsprengel) and the zoning-plan layer with PDF links both require a separate agreement with the city; the results of the 2026 mayoral runoff are online but not on the open data portal; live departures come from MVG's unofficial (tolerated) API rather than an official open feed. Opening these would make the official version much better.
+
+## The wiki (agent-maintained knowledge base)
 
 A Karpathy-style "LLM wiki": instead of retrieving raw chunks at question time, maintainer agents compile primary sources into cross-linked Markdown pages ahead of time.
 

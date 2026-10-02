@@ -121,7 +121,7 @@ export async function indicator(
     variants,
     year,
     years,
-    unit_hint: rows[0]["Name Basiswert 1"] ? `ratio of "${rows[0]["Name Basiswert 1"]}"${rows[0]["Name Basiswert 2"] ? ` to "${rows[0]["Name Basiswert 2"]}"` : ""}` : undefined,
+    unit_hint: pool[0]?.["Name Basiswert 1"] ? `ratio of "${pool[0]["Name Basiswert 1"]}"${pool[0]["Name Basiswert 2"] ? ` to "${pool[0]["Name Basiswert 2"]}"` : ""}` : undefined,
     city: inYear.find((u) => u.code === "00")?.value,
     districts: units.sort((a, b) => a.code.localeCompare(b.code)),
     series,

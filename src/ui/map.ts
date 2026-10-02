@@ -15,6 +15,9 @@ export interface MapView {
   markers?: { lat: number; lon: number; label: string; sublabel?: string; href?: string; color?: string; details?: Record<string, string> }[];
   shapes?: { geometry: any; label?: string; sublabel?: string; color?: string }[];
   cards?: { title: string; lines: string[]; tone?: string; links?: { label: string; href: string }[] }[];
+  /** WMS overlays (e.g. official noise or flood maps), switchable in a layer control. */
+  overlays?: { label: string; url: string; layers: string; opacity?: number; visible?: boolean }[];
+  legend?: { color: string; label: string }[];
   attribution?: string;
 }
 
@@ -31,12 +34,20 @@ export function renderMap(root: HTMLElement, v: MapView, host: Host) {
     v.banner ? h("div", { class: `banner ${v.banner.tone}` }, v.banner.text) : null,
     v.cards?.length ? renderCards(v.cards, host) : null,
     mapEl,
+    v.legend?.length ? h("div", { class: "legend" }, v.legend.map((l) => h("span", null, h("i", { style: { background: l.color } }), l.label))) : null,
     list,
     h("div", { class: "attr" }, `Map: © GeoBasis-DE / BKG (${new Date().getFullYear()}) CC BY 4.0. Data: ${v.attribution ?? "Landeshauptstadt München"}. Unofficial munichMCP.`),
   );
 
   const map = L.map(mapEl, { zoomControl: true, attributionControl: false, scrollWheelZoom: false }).setView([v.center.lat, v.center.lon], v.zoom ?? 15);
   L.tileLayer(TILE(host.dark), { maxZoom: 19, maxNativeZoom: 18, minZoom: 10 }).addTo(map);
+  const overlays: Record<string, L.TileLayer.WMS> = {};
+  for (const o of v.overlays ?? []) {
+    const layer = L.tileLayer.wms(o.url, { layers: o.layers, format: "image/png", transparent: true, opacity: o.opacity ?? 0.6, version: "1.3.0", maxZoom: 19 });
+    if (o.visible) layer.addTo(map);
+    overlays[o.label] = layer;
+  }
+  if (Object.keys(overlays).length) L.control.layers(undefined, overlays, { collapsed: false, position: "topright" }).addTo(map);
   const bounds = L.latLngBounds([[v.center.lat, v.center.lon], [v.center.lat, v.center.lon]]);
 
   if (v.radius_m) L.circle([v.center.lat, v.center.lon], { radius: v.radius_m, color: "#0b5cad", weight: 1, fillOpacity: 0.04 }).addTo(map);

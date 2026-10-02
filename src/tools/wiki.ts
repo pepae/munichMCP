@@ -55,7 +55,8 @@ export function registerWikiReadTools(server: McpServer) {
         citationsMd([cite("wiki", wiki.loadedAt)]);
       return {
         text,
-        data: { slug: p.slug, title: p.title, type: p.type, updated: p.updated, sources: p.sources, tags: p.tags, outgoing: r.outgoing, backlinks: r.backlinks, url: wikiUrl(p.slug) },
+        data: { slug: p.slug, title: p.title, type: p.type, updated: p.updated, body: p.body.trim(), sources: p.sources, tags: p.tags, outgoing: r.outgoing, backlinks: r.backlinks.slice(0, 15), backlink_count: r.backlinks.length, url: wikiUrl(p.slug) },
+        summary: false,
         view: { kind: "wiki", slug: p.slug, title: p.title, type: p.type, updated: p.updated, body: p.body, sources: p.sources, tags: p.tags, outgoing: r.outgoing, backlinks: r.backlinks, url: wikiUrl(p.slug) },
       };
     },

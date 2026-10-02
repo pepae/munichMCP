@@ -22,7 +22,9 @@ export function registerAboutTools(server: McpServer) {
           `munichMCP ${config.version} is an unofficial MCP server for the City of Munich, built as a proposal for an official city MCP. ` +
           `It is not affiliated with or endorsed by the Landeshauptstadt München. It reads official open data and public city services live or from daily caches, and ` +
           `every result names its source. The wiki currently has ${wiki.size} agent-maintained pages.\n\nData sources:\n${rows.join("\n")}\n\n` +
-          `Caveats: open data can lag behind reality; the MVG realtime API is unofficial and only tolerated for moderate non-commercial use; the rent calculation follows the published Mietspiegel method but is not legal advice. ` +
+          `Caveats: open data can lag behind reality; the MVG realtime API is unofficial and only tolerated for moderate non-commercial use; the rent calculation follows the published Mietspiegel method but is not legal advice; ` +
+          `noise levels are modelled (EU noise maps 2022, 4 m above ground, loudest side of the building) and flood maps cover rivers, not flash floods from heavy rain; ` +
+          `budget figures are ordinary income and expenses of the core budget (accrual accounting). ` +
           `Web: ${config.publicUrl}`,
         data: { version: config.version, sources: Object.values(SOURCES), wiki_pages: wiki.size, url: config.publicUrl },
       };

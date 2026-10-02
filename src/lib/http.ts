@@ -78,4 +78,14 @@ export function decodeBody(bytes: Uint8Array, contentType?: string | null): stri
   }
 }
 
+/** HEAD request: does the URL exist (2xx)? */
+export async function urlExists(url: string, timeoutMs = 8000): Promise<boolean> {
+  try {
+    const res = await fetch(url, { method: "HEAD", headers: { "User-Agent": config.userAgent }, signal: AbortSignal.timeout(timeoutMs), redirect: "follow" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
