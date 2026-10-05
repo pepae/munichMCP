@@ -55,7 +55,7 @@ schema.md                                                         the rules main
 - The repo's `wiki/` is the seed: new seed pages are copied into the live wiki on boot, existing pages are never overwritten.
 - `scripts/generate-district-pages.ts` regenerates the 25 district pages from open data.
 
-Refresh loop: the collector runs every `COLLECTOR_INTERVAL_HOURS` (default 24). Point any agent at the maintainer endpoint with `wiki/MAINTAINER_PROMPT.md` weekly (for example a Claude Code routine or the GitHub Action in `.github/workflows/wiki-maintainer.yml`).
+Refresh loop: the collector runs every `COLLECTOR_INTERVAL_HOURS` (default 24). Point any agent at the maintainer endpoint with `wiki/MAINTAINER_PROMPT.md` weekly, for example a Claude Code routine or the GitHub Action in `.github/workflows/wiki-maintainer.yml` (it stays inactive until the repository secrets `ANTHROPIC_API_KEY` and `MUNICHMCP_MAINTAINER_TOKEN` are set). The last full maintainer pass was on 2 October 2026.
 
 ## Connect
 
@@ -69,6 +69,7 @@ Refresh loop: the collector runs every `COLLECTOR_INTERVAL_HOURS` (default 24). 
 npm install
 npm run build:ui          # single-file MCP Apps view + playground into dist/ui
 npm run start:dev         # tsx src/server.ts on :8420
+npm run typecheck         # server and UI
 npm test                  # unit tests incl. 780 official Mietspiegel values
 npm run smoke             # end-to-end over MCP against localhost (or pass a URL)
 ```
@@ -82,8 +83,8 @@ Environment: `PORT`, `PUBLIC_URL`, `DATA_DIR`, `WIKI_MAINTAINER_TOKEN`, `COLLECT
 ## Architecture
 
 - TypeScript, MCP TypeScript SDK v2 (`createMcpHandler`: serves the 2026-07-28 protocol and stateless 2025 clients), Express.
-- One MCP Apps view (`ui://munichmcp/view-v1.html`, Leaflet + basemap.de tiles) renders maps, departure boards, the rent calculator, bar charts and wiki pages; view-only payloads travel in `_meta` so they stay out of the model context.
-- Open datasets are cached on disk and in memory (daily, roadworks hourly); live APIs are cached for 30 s to 15 min to keep upstream load low; per-client rate limiting.
+- One MCP Apps view (`ui://munichmcp/view-v1.html`, Leaflet + basemap.de tiles) renders maps, departure boards, the rent calculator, bar charts and wiki pages; the noise and flood view adds the LfU's official WMS maps as switchable layers. The view's CSP allows only basemap.de and lfu.bayern.de. View-only payloads travel in `_meta` so they stay out of the model context.
+- Open datasets are cached on disk and in memory (daily, roadworks hourly; final election results for a year; noise and flood lookups per address for 30 days); live APIs are cached for 30 s to 15 min to keep upstream load low; per-client rate limiting.
 
 ## Licence and data
 
