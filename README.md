@@ -1,10 +1,59 @@
 # munichMCP
 
-An **unofficial** [Model Context Protocol](https://modelcontextprotocol.io) server that gives AI assistants live, cited access to Munich's public data, with interactive views ([MCP Apps](https://github.com/modelcontextprotocol/ext-apps)) that render inside ChatGPT and Claude. It is built as a proposal for an official city MCP, and it is not affiliated with the Landeshauptstadt München.
+**Ask an AI assistant about Munich and get official, cited answers.** What applies at an address, how loud the street is, whether it can flood, when the next U-Bahn leaves, what the fair rent is, how the neighbourhood voted, where the city's money goes. munichMCP is a [Model Context Protocol](https://modelcontextprotocol.io) server over Munich's public data, with interactive views ([MCP Apps](https://github.com/modelcontextprotocol/ext-apps)) that render inside ChatGPT and Claude.
+
+It is an **unofficial** proposal for an official city MCP and is not affiliated with the Landeshauptstadt München.
+
+<p align="center">
+  <img src="docs/media/address-report.gif" alt="Asking what applies at Wörthstraße 10: district, zoning plan, Milieuschutz, resident parking, solar potential, noise, flood risk and a map with nearby stops and facilities" width="820">
+</p>
 
 - Live server: `https://munichmcp.duckdns.org/mcp` (Streamable HTTP, no auth, read-only)
 - Browser playground: `https://munichmcp.duckdns.org/playground`
 - Wiki: `https://munichmcp.duckdns.org/wiki`
+
+## See it in action
+
+<table>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/media/noise-flood.gif" alt="Noise map of Landshuter Allee 51 with day and night layers, then the flood zone at the Flaucher"><br><b>Noise and flood risk.</b> Official EU noise maps and flood hazard maps for any address, as switchable map layers.</td>
+    <td width="50%" valign="top"><img src="docs/media/getting-around.gif" alt="Live departure board at Sendlinger Tor, then a trip from Marienplatz to the airport"><br><b>Getting around.</b> Live departures with replacement services and cancellations, and door-to-door trips with fare zones.</td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/media/rent.gif" alt="Mietspiegel 2025 rent check for 70 square metres at Wörthstraße 10, recalculated for a central good location"><br><b>Rent check.</b> The official Mietspiegel 2025 comparative rent, recalculated inside the chat as you change the flat's details.</td>
+    <td width="50%" valign="top"><img src="docs/media/civic.gif" alt="Green party share by district, city budget by department, and the date of the Moosach residents' assembly"><br><b>Civic data.</b> Election results by district, the city budget by department, and when your district's residents' assembly meets.</td>
+  </tr>
+</table>
+
+The recordings show live data from the public server in the playground, which renders the same MCP Apps view as ChatGPT and Claude. `npm run demos` re-records them.
+
+## How it works
+
+```mermaid
+flowchart TB
+  subgraph hosts["AI assistants"]
+    direction LR
+    chatgpt["ChatGPT"] ~~~ claude["Claude"] ~~~ mucgpt["MUCGPT"] ~~~ any["any MCP client"]
+  end
+
+  subgraph mcp["munichMCP"]
+    direction LR
+    tools["26 read-only tools<br/>answers with sources<br/>and licences"] -. "ui:// view" .-> view["MCP Apps view<br/>maps, departure boards,<br/>rent calculator, charts"]
+    tools --- wiki["agent-maintained<br/>wiki"]
+  end
+
+  subgraph data["Official sources, cached for 30 seconds to a year"]
+    direction LR
+    geo["GeoPortal München<br/>zoning, Milieuschutz,<br/>parking, addresses"] ~~~ portal["Open data portal<br/>facilities, statistics,<br/>elections, budget"] ~~~ transit["MVG and MVV<br/>live departures,<br/>timetables"] ~~~ lfu["Environment Agency<br/>noise and<br/>flood maps"] ~~~ more["DWD, UBA, Isar,<br/>council motions,<br/>city services"]
+  end
+
+  hosts -- "MCP over HTTPS" --> mcp
+  mcp --> data
+```
+
+1. You ask your assistant a question about Munich. It picks a tool, for example `noise_and_flood` with your address.
+2. munichMCP geocodes the address with the city's own address index and queries the official sources, mostly from a cache so the city's servers see little load.
+3. The answer comes back as text with its sources, licences and retrieval times, plus a structured result. Hosts that support MCP Apps render the interactive view next to the answer.
 
 ## What it can answer that web search cannot
 
@@ -42,6 +91,15 @@ Some of the most useful data is published but not under an open licence, so muni
 
 A Karpathy-style "LLM wiki": instead of retrieving raw chunks at question time, maintainer agents compile primary sources into cross-linked Markdown pages ahead of time.
 
+```mermaid
+flowchart LR
+  feeds["Council and district motions<br/>Rathaus Umschau press releases<br/>new open datasets"] -- "daily collector<br/>(no LLM)" --> raw[("raw/ inbox<br/>immutable")]
+  raw -- "weekly maintainer agent<br/>(token-protected endpoint)" --> pages["topics, entities,<br/>overview, index"]
+  pages -- "wiki_search, wiki_read" --> assistants["assistants"]
+  pages -- "/wiki" --> people["people"]
+  pages -. "every write" .-> git[("git history")]
+```
+
 ```
 raw/      immutable captures, written daily by a deterministic collector (no LLM):
           council + district committee motions, Rathaus Umschau press releases, new open datasets
@@ -72,6 +130,7 @@ npm run start:dev         # tsx src/server.ts on :8420
 npm run typecheck         # server and UI
 npm test                  # unit tests incl. 780 official Mietspiegel values
 npm run smoke             # end-to-end over MCP against localhost (or pass a URL)
+npm run demos             # re-record the README GIFs (needs Chrome or Edge and ffmpeg)
 ```
 
 Environment: `PORT`, `PUBLIC_URL`, `DATA_DIR`, `WIKI_MAINTAINER_TOKEN`, `COLLECTOR_INTERVAL_HOURS`, `MIETSPIEGEL_ENABLED` (set `0` to disable the rent tool), `ALLOWED_HOSTS`.
