@@ -1,0 +1,23 @@
+# Länderübergreifendes Hochwasserportal (LHP) public API
+id: flood-portal
+name: Länderübergreifendes Hochwasserportal (LHP) public API
+description: "Cross-state flood portal: current flood warning class for Bavarian gauges."
+publisher: "Hochwasserzentralen der Länder (Datenquelle: www.hochwasserzentralen.de)"
+licence: CC BY 4.0
+homepage: https://www.hochwasserzentralen.de
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/environment.ts
+  source_id: floodPortal
+refresh: 15 minutes
+questions:
+  - Is there a flood warning on the Isar?
+checks:
+  - type: http
+    name: flood portal API
+    url: https://api.hochwasserzentralen.de/public/v1/data/stations?states=BY
+    expect_text: lhpClass
+added: 2026-09-25
+reviewed: 2026-10-16

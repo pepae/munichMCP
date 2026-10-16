@@ -1,0 +1,23 @@
+# Photon geocoder (OpenStreetMap data)
+id: photon
+name: Photon geocoder (OpenStreetMap data)
+description: OpenStreetMap geocoder (komoot Photon), fallback for landmarks and places outside the city.
+publisher: komoot / OpenStreetMap contributors
+licence: ODbL (OpenStreetMap)
+homepage: https://photon.komoot.io
+access: public-api
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/lib/geocode.ts
+  source_id: photon
+refresh: live
+questions:
+  - Where is the Olympiapark?
+checks:
+  - type: http
+    name: Photon reachable
+    url: https://photon.komoot.io/api/?q=Olympiapark%20M%C3%BCnchen&limit=1
+    expect_text: Olympiapark
+added: 2026-09-25
+reviewed: 2026-10-16

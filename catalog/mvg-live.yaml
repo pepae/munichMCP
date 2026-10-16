@@ -1,0 +1,40 @@
+# MVG live departures and messages (unofficial mvg.de API)
+id: mvg-live
+name: MVG live departures and messages (unofficial mvg.de API)
+description: Live departures, disruptions and journey planning from the API behind mvg.de (undocumented, tolerated for moderate use, heavily cached).
+publisher: Münchner Verkehrsgesellschaft (MVG)
+licence: Not licensed; MVG tolerates moderate private, non-commercial use
+homepage: https://www.mvg.de
+access: tolerated-unofficial
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/transit.ts
+  source_id: mvg
+refresh: live
+questions:
+  - When does the next U-Bahn leave Sendlinger Tor?
+checks:
+  - type: http
+    name: MVG API reachable
+    url: https://www.mvg.de/api/bgw-pt/v3/locations?query=Marienplatz&locationTypes=STATION
+    expect_text: Marienplatz
+  - type: tool
+    tool: departures
+    args:
+      station: Marienplatz
+      limit: 3
+    expect: Departures at Marienplatz
+  - type: tool
+    tool: nearby_stops
+    args:
+      address: Rosenheimer Straße 5
+    expect: Stops near
+  - type: tool
+    tool: plan_trip
+    args:
+      from: Marienplatz
+      to: Flughafen München
+    expect: Connections from Marienplatz
+added: 2026-09-25
+reviewed: 2026-10-16

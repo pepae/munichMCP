@@ -4,6 +4,9 @@ import type { z } from "zod";
 import { LocationError } from "../lib/geocode.js";
 import type { Citation } from "../lib/sources.js";
 
+/** An error caused by the request itself (not by an upstream source). */
+export class InputError extends Error {}
+
 /** Single bundled MCP App view (switches renderer on `view.kind`). */
 export const VIEW_URI = "ui://munichmcp/view-v1.html";
 
@@ -98,7 +101,7 @@ export function defineTool<S extends z.ZodObject>(
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[tool] ${name} failed ${Date.now() - started}ms: ${msg}`);
-      const hint = err instanceof LocationError ? "" : " The upstream data source may be temporarily unavailable; try again shortly.";
+      const hint = err instanceof LocationError || err instanceof InputError ? "" : " The upstream data source may be temporarily unavailable; try again shortly.";
       return { isError: true, content: [{ type: "text", text: `${name} failed: ${msg}.${hint}` }] };
     }
   };

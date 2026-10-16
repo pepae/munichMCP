@@ -16,6 +16,10 @@ export const config = {
   wikiDir: path.resolve(process.env.WIKI_DIR ?? path.join(dataDir, "wiki")),
   wikiSeedDir: path.resolve(process.env.WIKI_SEED_DIR ?? path.join(root, "wiki")),
   uiDistDir: path.resolve(process.env.UI_DIST_DIR ?? path.join(root, "dist", "ui")),
+  /** Source manifests (one YAML file per data source). */
+  catalogDir: path.resolve(process.env.CATALOG_DIR ?? path.join(root, "catalog")),
+  /** Run the source health checks every N hours (0 disables). */
+  healthIntervalHours: Number(process.env.HEALTH_INTERVAL_HOURS ?? 24),
   /** Bearer token for the maintainer endpoint (wiki write tools). Disabled when unset. */
   maintainerToken: process.env.WIKI_MAINTAINER_TOKEN || undefined,
   /** Run the deterministic wiki inbox collector every N hours (0 disables). */

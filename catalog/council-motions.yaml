@@ -1,0 +1,32 @@
+# Ratsinformationssystem München (RSS feeds)
+id: council-motions
+name: Ratsinformationssystem München (RSS feeds)
+description: "RSS feeds of the city council's information system: new motions and inquiries of the council and district committees."
+publisher: Landeshauptstadt München, Direktorium
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://risi.muenchen.de
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/council.ts
+  source_id: ris
+refresh: daily
+questions:
+  - What has the council asked about cycling lanes?
+checks:
+  - type: http
+    name: council feed
+    url: https://risi.muenchen.de/risi/rss?feed=StR-Antraege
+    expect_text: <item>
+  - type: http
+    name: district committee feed
+    url: https://risi.muenchen.de/risi/rss?feed=BA-Antraege
+    expect_text: <item>
+  - type: tool
+    tool: council_search
+    args:
+      query: Radweg
+    expect: council item
+added: 2026-09-25
+reviewed: 2026-10-16

@@ -1,0 +1,35 @@
+# Bürgerversammlungen: dates and venues
+id: residents-assemblies
+name: "Bürgerversammlungen: dates and venues"
+description: Dates and venues of the district residents' assemblies (Bürgerversammlungen).
+publisher: Landeshauptstadt München, Direktorium
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/dataset/termine-buergerversammlungen-muenchen
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/civic.ts
+  source_id: assemblies
+refresh: yearly (schedule published in January)
+questions:
+  - When is the Bürgerversammlung in Moosach?
+checks:
+  - type: ckan
+    dataset: termine-buergerversammlungen-muenchen
+    max_age_days: 400
+    columns:
+      - wochentag
+      - datum
+      - uhrzeit
+      - stadtbezirk_nummer
+      - veranstaltungsort
+      - strasse
+    licence_id: dl-by-de/2.0
+  - type: tool
+    tool: citizens_assemblies
+    args:
+      district: Moosach
+    expect: Moosach
+added: 2026-09-25
+reviewed: 2026-10-16

@@ -1,0 +1,45 @@
+# City of Munich open data (facilities and points of interest)
+id: facilities
+name: City of Munich open data (facilities and points of interest)
+description: "Facilities from the open data portal and GeoPortal: drinking fountains, toilets, playgrounds, Kitas, pools, markets,
+  recycling, social and cultural venues."
+publisher: Landeshauptstadt München (various departments)
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0) unless noted
+homepage: https://opendata.muenchen.de
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/places.ts
+  source_id: places
+refresh: daily
+questions:
+  - Where is the nearest drinking fountain to Viktualienmarkt?
+checks:
+  - type: wfs
+    layer: baug_wfs:trinkwasserbrunnen
+    min_features: 100
+  - type: ckan
+    dataset: kindertagesbetreuungseinrichtungen-in-muenchen
+    max_age_days: 400
+    columns:
+      - Name Einrichtung
+      - Geokoordinaten Breite
+      - Geokoordinaten Länge
+    licence_id: dl-by-de/2.0
+  - type: ckan
+    dataset: oeffentliche-spielplaetze-muenchen
+    columns:
+      - ADDRESS.Bezeichnung
+      - ADDRESS.Lat
+      - ADDRESS.Lon
+    licence_id: dl-by-de/2.0
+  - type: tool
+    tool: find_nearby
+    args:
+      category: drinking_fountain
+      address: Viktualienmarkt
+      radius_m: 1500
+    expect: brunnen
+added: 2026-09-25
+reviewed: 2026-10-16

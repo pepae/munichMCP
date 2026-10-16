@@ -1,0 +1,51 @@
+name: New data source
+description: Suggest a dataset, API or feed about Munich that munichMCP should use.
+title: "Data source: "
+labels: ["source-proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. A maintainer reviews the proposal and can hand it to the intake agent, which checks the licence, explores the data and prepares a pull request with tests. A human approves every change before it goes live.
+
+        **Never paste API keys, tokens or passwords here.** If the source needs credentials, say so below; a maintainer arranges the key through the deployment's secret store.
+  - type: input
+    id: url
+    attributes:
+      label: Where is the data?
+      description: Dataset page, API base URL or feed URL.
+      placeholder: https://opendata.muenchen.de/dataset/...
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What does it contain?
+    validations:
+      required: true
+  - type: textarea
+    id: questions
+    attributes:
+      label: Which questions would it answer?
+      placeholder: |
+        Where is the nearest ... to my address?
+        When does ... open?
+  - type: input
+    id: licence
+    attributes:
+      label: Licence (if known)
+      placeholder: dl-de/by-2.0, CC BY 4.0, CC0, ...
+  - type: input
+    id: docs
+    attributes:
+      label: Documentation (if any)
+  - type: dropdown
+    id: credentials
+    attributes:
+      label: Does access need credentials?
+      options:
+        - "No, it is public"
+        - "Yes, an API key or login (do not paste it here)"
+        - "I don't know"
+    validations:
+      required: true

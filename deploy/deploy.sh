@@ -22,9 +22,20 @@ rm -rf app.old && { [ -d app ] && mv app app.old || true; } && mv app.new app
 [ -f .env ] || { echo "WIKI_MAINTAINER_TOKEN=\$(openssl rand -hex 24)" > .env; chmod 600 .env; echo "created .env with a new maintainer token"; }
 cp .env app/.env
 cd app
+# Keep the running image as munichmcp:previous so a bad release can be rolled back.
+docker image inspect munichmcp:latest >/dev/null 2>&1 && docker tag munichmcp:latest munichmcp:previous || true
 docker compose -p munichmcp build --pull
 docker compose -p munichmcp up -d --remove-orphans
-sleep 5
+for i in \$(seq 1 30); do
+  if curl -fsS http://127.0.0.1:8420/health >/dev/null 2>&1; then echo "healthy"; break; fi
+  sleep 2
+done
+if ! curl -fsS http://127.0.0.1:8420/health >/dev/null 2>&1; then
+  echo "new release is not healthy, rolling back"
+  docker tag munichmcp:previous munichmcp:latest
+  docker compose -p munichmcp up -d --no-build
+  exit 1
+fi
 docker compose -p munichmcp ps
 EOF
 echo "==> done"

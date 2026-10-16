@@ -1,0 +1,29 @@
+# Environmental noise maps 2022 (Umgebungslärmkartierung, Ballungsraum München)
+id: lfu-noise
+name: Environmental noise maps 2022 (Umgebungslärmkartierung, Ballungsraum München)
+description: "EU environmental noise maps 2022 for the Munich agglomeration: road, tram/U-Bahn and industry, Lden and Lnight."
+publisher: "Bayerisches Landesamt für Umwelt (Datenquelle: Bayerisches Landesamt für Umwelt, www.lfu.bayern.de)"
+licence: CC BY 4.0
+homepage: https://www.lfu.bayern.de/laerm/umgebungslaerm/index.htm
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/risks.ts
+  source_id: lfuNoise
+refresh: every five years (EU noise mapping)
+questions:
+  - How loud is it at Landshuter Allee 51?
+checks:
+  - type: http
+    name: noise map service lists the 2022 layers
+    url: https://www.lfu.bayern.de/gdi/wms/laerm/ballungsraeume?service=WMS&request=GetCapabilities&version=1.3.0
+    expect_text: aggroadlden2022
+  - type: tool
+    name: "known answer: Landshuter Allee 51 is above 70 dB(A)"
+    tool: noise_and_flood
+    args:
+      address: Landshuter Allee 51
+    expect: "Road traffic: 7\\d\\.\\d dB\\(A\\) Lden"
+added: 2026-09-25
+reviewed: 2026-10-16

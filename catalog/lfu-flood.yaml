@@ -1,0 +1,30 @@
+# Flood hazard areas and designated flood zones (Hochwassergefahrenflächen, Überschwemmungsgebiete)
+id: lfu-flood
+name: Flood hazard areas and designated flood zones (Hochwassergefahrenflächen, Überschwemmungsgebiete)
+description: Flood hazard areas (frequent, 100-year, extreme flood), protected areas and designated flood zones.
+publisher: "Bayerisches Landesamt für Umwelt (Datenquelle: Bayerisches Landesamt für Umwelt, www.lfu.bayern.de)"
+licence: CC BY 4.0
+homepage: https://www.lfu.bayern.de/wasser/hw_ue_gebiete/index.htm
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/risks.ts
+  source_id: lfuFlood
+refresh: when the authority updates the maps
+questions:
+  - Can the Flaucher flood?
+checks:
+  - type: http
+    name: flood map service
+    url: https://www.lfu.bayern.de/gdi/wms/wasser/ueberschwemmungsgebiete?service=WMS&request=GetCapabilities&version=1.3.0
+    expect_text: hwgf_hq100
+  - type: tool
+    name: "known answer: the Flaucher is in the 100-year flood area"
+    tool: noise_and_flood
+    args:
+      lat: 48.1105
+      lon: 11.5575
+    expect: 100-year flood
+added: 2026-09-25
+reviewed: 2026-10-16

@@ -1,0 +1,90 @@
+name: source intake
+
+# Turns a proposed data source into a pull request:
+# - a maintainer adds the label "intake-agent" to a "New data source" issue, or
+# - daily, for proposals submitted with the propose_data_source tool, or
+# - manually for one proposal id.
+# The agent checks the licence, explores the data, writes the manifest and
+# health checks, verifies them against a local server and opens a pull
+# request. A maintainer reviews and merges. Inert until ANTHROPIC_API_KEY is
+# set (MUNICHMCP_MAINTAINER_TOKEN is needed for tool-submitted proposals).
+
+on:
+  issues:
+    types: [labeled]
+  schedule:
+    - cron: "30 5 * * *"
+  workflow_dispatch:
+    inputs:
+      proposal_id:
+        description: "Proposal id (P-xxxxxxxx) from /status"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: source-intake
+  cancel-in-progress: false
+
+jobs:
+  intake:
+    if: github.event_name != 'issues' || github.event.label.name == 'intake-agent'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      MUNICHMCP_MAINTAINER_TOKEN: ${{ secrets.MUNICHMCP_MAINTAINER_TOKEN }}
+      MUNICHMCP_URL: https://munichmcp.duckdns.org
+      GH_TOKEN: ${{ github.token }}
+      # Untrusted text: passed through the environment, never interpolated into scripts.
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_BODY: ${{ github.event.issue.body }}
+      PROPOSAL_ID: ${{ inputs.proposal_id }}
+    steps:
+      - name: Check configuration
+        id: cfg
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then echo "ANTHROPIC_API_KEY not set; skipping."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ -z "$ISSUE_NUMBER" ] && [ -z "$MUNICHMCP_MAINTAINER_TOKEN" ]; then echo "No issue and no maintainer token; skipping."; echo "skip=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.skip != 'true'
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.skip != 'true'
+        with:
+          node-version: 24
+          cache: npm
+      - name: Prepare the request
+        if: steps.cfg.outputs.skip != 'true'
+        run: |
+          mkdir -p intake
+          if [ -n "$ISSUE_NUMBER" ]; then
+            printf '# Issue #%s: %s\n\n%s\n' "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ISSUE_BODY" > intake/request.md
+            echo "Source: GitHub issue #$ISSUE_NUMBER (comment on it when done)." > intake/where.txt
+          elif [ -n "$PROPOSAL_ID" ]; then
+            echo "Source: proposal $PROPOSAL_ID. Read it with source_proposals (id), then update_proposal." > intake/where.txt
+          else
+            echo "Source: the oldest proposal with status new (source_proposals). Process at most one; if there is none, stop." > intake/where.txt
+          fi
+          if [ -n "$MUNICHMCP_MAINTAINER_TOKEN" ]; then
+            printf '{"mcpServers":{"munichmcp-maintainer":{"type":"http","url":"%s/maintainer/mcp","headers":{"Authorization":"Bearer %s"}}}}' "$MUNICHMCP_URL" "$MUNICHMCP_MAINTAINER_TOKEN" > "$RUNNER_TEMP/mcp.json"
+          else
+            echo '{"mcpServers":{}}' > "$RUNNER_TEMP/mcp.json"
+          fi
+      - name: Run the intake agent
+        if: steps.cfg.outputs.skip != 'true'
+        run: |
+          npm ci
+          npm install -g @anthropic-ai/claude-code
+          git config user.name "munichmcp-intake"
+          git config user.email "source-intake@users.noreply.github.com"
+          claude -p "$(cat agents/source-intake.md)
+
+          $(cat intake/where.txt)" \
+            --model claude-opus-5-5 \
+            --mcp-config "$RUNNER_TEMP/mcp.json" \
+            --allowedTools "Read,Write,Edit,Glob,Grep,WebFetch,mcp__munichmcp-maintainer__source_proposals,mcp__munichmcp-maintainer__update_proposal,Bash(npm run *),Bash(npm ci),Bash(npm test),Bash(npx tsx *),Bash(node *),Bash(curl *),Bash(git *),Bash(gh pr *),Bash(gh issue *),Bash(sleep *),Bash(kill *)" \
+            --max-turns 120

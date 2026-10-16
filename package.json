@@ -12,7 +12,9 @@
     "smoke": "tsx scripts/smoke.ts",
     "build:server": "esbuild src/server.ts --bundle --platform=node --format=esm --packages=external --target=node22 --outfile=dist/server.js --log-level=warning",
     "start:dev": "tsx src/server.ts",
-    "demos": "tsx scripts/record-demos.ts"
+    "demos": "tsx scripts/record-demos.ts",
+    "check-sources": "tsx scripts/check-sources.ts",
+    "catalog:validate": "tsx scripts/check-sources.ts --validate"
   },
   "license": "MIT",
   "type": "module",

@@ -5,6 +5,8 @@ import { distanceToFeature, haversine, parseCoordinate, representativePoint, typ
 import { cite, type Citation, type SourceId } from "../lib/sources.js";
 import { fold } from "../lib/text.js";
 import { getLayer } from "../lib/wfs.js";
+import { catalog, fillTemplate, manifestCitation } from "../catalog/catalog.js";
+import type { Manifest } from "../catalog/manifest.js";
 
 /**
  * Point-of-interest registry over City of Munich open data: facilities,
@@ -30,6 +32,8 @@ interface CategoryDef {
   source: SourceId;
   dataset: string;
   load: () => Promise<{ items: Place[]; fetchedAt: number }>;
+  /** Catalog-defined categories cite their manifest instead of a built-in source. */
+  citation?: (fetchedAt: number) => Citation;
 }
 
 const clean = (v: unknown): string | undefined => {
@@ -123,7 +127,30 @@ async function loadBikeSharing(): Promise<{ items: Place[]; fetchedAt: number }>
   return { items: value, fetchedAt };
 }
 
-export const CATEGORIES: CategoryDef[] = [
+/** Turn a generic catalog manifest (YAML only, no code) into a category. */
+function fromManifest(m: Manifest): CategoryDef | undefined {
+  const impl = m.implementation;
+  if (impl.kind === "code" || m.status !== "active") return undefined;
+  const f = impl.fields;
+  const mapRow = (r: Record<string, unknown>) => ({
+    name: fillTemplate(f.name, r),
+    address: f.address ? fillTemplate(f.address, r) : undefined,
+    url: f.url ? fillTemplate(f.url, r) : undefined,
+    details: Object.fromEntries(Object.entries(f.details).map(([k, t]) => [k, fillTemplate(t, r)])),
+  });
+  const base = { id: impl.category.id, label: impl.category.label, group: impl.category.group, source: "places" as SourceId, citation: (t: number) => manifestCitation(m, t) };
+  if (impl.kind === "ckan-csv-points") {
+    const pts = impl.fields;
+    return {
+      ...base,
+      dataset: impl.dataset,
+      load: fromCsv(impl.category.id, impl.dataset, (r) => ({ ...mapRow(r), lat: fillTemplate(pts.lat, r), lon: fillTemplate(pts.lon, r) }), impl.resource ? new RegExp(impl.resource, "i") : undefined),
+    };
+  }
+  return { ...base, dataset: impl.layer.split(":")[1], load: fromLayer(impl.category.id, impl.layer, (p) => ({ ...mapRow(p), name: mapRow(p).name ?? m.name })) };
+}
+
+const BUILTIN: CategoryDef[] = [
   {
     id: "drinking_fountain", label: "Drinking fountains (Trinkbrunnen)", group: "everyday", source: "places", dataset: "opendata_trinkwasserbrunnen",
     load: fromLayer("drinking_fountain", "baug_wfs:trinkwasserbrunnen", (p) => ({ name: p.bezeichnung ?? "Trinkbrunnen", details: { note: p.bemerkung } })),
@@ -227,15 +254,6 @@ export const CATEGORIES: CategoryDef[] = [
     })),
   },
   {
-    id: "public_wifi", label: "Free public Wi-Fi (M-WLAN hotspots on public squares, city list of Oct 2023)", group: "everyday", source: "places", dataset: "wlan-standorte-lhm-muenchen",
-    load: fromCsv(
-      "public_wifi",
-      "wlan-standorte-lhm-muenchen",
-      (r) => ({ name: `M-WLAN ${clean(r.adresse) ?? ""}`.trim(), lat: r.latitude, lon: r.longitude, address: r.adresse, details: { type: r.typ, access_points: r.anzahl } }),
-      /ffentliche Pl/i,
-    ),
-  },
-  {
     id: "bike_sharing", label: "MVG Rad / MyRadl bike-sharing stations (live availability)", group: "mobility", source: "bikeSharing", dataset: "gbfs-nextbike_ml",
     load: loadBikeSharing,
   },
@@ -312,6 +330,11 @@ export const CATEGORIES: CategoryDef[] = [
   },
 ];
 
+export const CATEGORIES: CategoryDef[] = [
+  ...BUILTIN,
+  ...catalog.map(fromManifest).filter((c): c is CategoryDef => c !== undefined && !BUILTIN.some((b) => b.id === c.id)),
+];
+
 const CATEGORY_IDS = CATEGORIES.map((c) => c.id) as [string, ...string[]];
 export const categoryIds = CATEGORY_IDS;
 
@@ -344,7 +367,7 @@ export async function findNearby(categoryId: string, at: LonLat, opts: { limit?:
     label: cat.label,
     items: scored.slice(0, limit),
     total_in_radius: scored.length,
-    citation: { ...cite(cat.source, fetchedAt), url: `https://opendata.muenchen.de/dataset/${cat.dataset}` },
+    citation: cat.citation?.(fetchedAt) ?? { ...cite(cat.source, fetchedAt), url: `https://opendata.muenchen.de/dataset/${cat.dataset}` },
   };
 }
 

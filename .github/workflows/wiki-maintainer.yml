@@ -40,5 +40,5 @@ jobs:
           claude -p "$(cat prompt.md)" \
             --mcp-config mcp.json \
             --allowedTools "mcp__munichmcp-maintainer" \
-            --model claude-sonnet-5 \
+            --model claude-opus-5-5 \
             --max-turns 80

@@ -1,0 +1,60 @@
+name: deploy
+
+# Merge to main means live: deploy to the server, then run the end-to-end
+# tests against production. deploy.sh rolls back by itself if the new
+# container does not become healthy; if the end-to-end tests fail afterwards,
+# this workflow rolls back too. Inert until the deploy secrets are set:
+#   DEPLOY_HOST (user@host), DEPLOY_SSH_KEY (private key), DEPLOY_KNOWN_HOSTS
+# Use a protected "production" environment to require an approval per deploy.
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 30
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+    steps:
+      - name: Check configuration
+        id: cfg
+        run: |
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_SSH_KEY" ]; then echo "Deploy secrets not set; skipping."; echo "skip=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.skip != 'true'
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.skip != 'true'
+        with:
+          node-version: 24
+          cache: npm
+      - name: SSH setup
+        if: steps.cfg.outputs.skip != 'true'
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Deploy
+        if: steps.cfg.outputs.skip != 'true'
+        run: bash deploy/deploy.sh "$DEPLOY_HOST"
+      - name: End-to-end tests against production
+        if: steps.cfg.outputs.skip != 'true'
+        run: |
+          npm ci
+          sleep 20
+          npm run smoke -- https://munichmcp.duckdns.org/mcp
+      - name: Roll back
+        if: failure() && steps.cfg.outputs.skip != 'true'
+        run: bash deploy/rollback.sh "$DEPLOY_HOST"

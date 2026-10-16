@@ -1,0 +1,33 @@
+# Münchner Stadtbibliothek catalog (OAI-PMH) and branch list
+id: libraries
+name: Münchner Stadtbibliothek catalog (OAI-PMH) and branch list
+description: Branches of the Münchner Stadtbibliothek with opening details.
+publisher: Münchner Stadtbibliothek
+licence: CC0 1.0
+homepage: https://opendata.muenchen.de/dataset/katalogdaten-abfrage-aller-titelsaetze
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/places.ts
+  source_id: library
+refresh: monthly
+questions:
+  - Where is the nearest library?
+checks:
+  - type: ckan
+    dataset: standortliste-der-muenchner-stadtbibliothek
+    columns:
+      - bib_name
+      - lat
+      - lon
+    licence_id: dl-by-de/2.0
+  - type: tool
+    tool: find_nearby
+    args:
+      category: library
+      address: Marienplatz
+      radius_m: 3000
+    expect: bibliothek
+added: 2026-09-25
+reviewed: 2026-10-16

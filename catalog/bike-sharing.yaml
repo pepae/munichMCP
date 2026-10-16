@@ -1,0 +1,30 @@
+# MyRadl / MVG Rad bike sharing (GBFS 2.3 feed nextbike_ml)
+id: bike-sharing
+name: MyRadl / MVG Rad bike sharing (GBFS 2.3 feed nextbike_ml)
+description: MyRadl (MVG Rad) stations with live bike availability (GBFS).
+publisher: nextbike GmbH for MVV/MVG
+licence: CC0 1.0 (declared in the feed)
+homepage: https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_ml/gbfs.json
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/places.ts
+  source_id: bikeSharing
+refresh: 1 minute
+questions:
+  - Where can I rent a bike near Marienplatz?
+checks:
+  - type: http
+    name: GBFS feed
+    url: https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_ml/de/station_status.json
+    expect_text: num_bikes_available
+  - type: tool
+    tool: find_nearby
+    args:
+      category: bike_sharing
+      address: Marienplatz
+      radius_m: 800
+    expect: MyRadl
+added: 2026-09-25
+reviewed: 2026-10-16

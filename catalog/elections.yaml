@@ -1,0 +1,30 @@
+# Election results and polling precincts (Wahlamt München)
+id: elections
+name: Election results and polling precincts (Wahlamt München)
+description: Final results of the 2026 city council and mayoral elections and the 2025 federal election, with polling precinct boundaries.
+publisher: Landeshauptstadt München, Kreisverwaltungsreferat, Wahlamt
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/dataset/stadtratswahl-2026-ergebnisse-muenchen
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/elections.ts
+  source_id: elections
+refresh: after each election
+questions:
+  - How did Haidhausen vote in the council election?
+checks:
+  - type: http
+    name: results archive
+    url: https://www.wahlen-muenchen.de/ergebnisse/20260308oberbuergermeisterwahl/endergebnis_stadtratswahl.zip
+  - type: ckan
+    dataset: wahlen-stimm-und-briefwahlbezirke-in-muenchen
+    licence_id: dl-by-de/2.0
+  - type: tool
+    name: "known answer: council election turnout 52.3 %"
+    tool: election_results
+    args: {}
+    expect: turnout 52\.3 %
+added: 2026-09-25
+reviewed: 2026-10-16

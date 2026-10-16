@@ -1,0 +1,28 @@
+# munichMCP wiki (agent-maintained, cross-linked Markdown knowledge base)
+id: wiki
+name: munichMCP wiki (agent-maintained, cross-linked Markdown knowledge base)
+description: The agent-maintained, cross-linked knowledge base compiled from council motions, press releases and datasets.
+publisher: munichMCP contributors and maintainer agents; every page cites its primary sources
+licence: CC BY 4.0 (pages); underlying sources keep their own licences
+homepage: https://github.com/pepae/munichMCP/tree/main/wiki
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/wiki.ts
+  source_id: wiki
+refresh: daily collector, weekly maintainer
+questions:
+  - What happened in Munich this week?
+checks:
+  - type: tool
+    tool: wiki_index
+    args: {}
+    expect: pages
+  - type: tool
+    tool: wiki_read
+    args:
+      page: overview
+    expect: This week in Munich
+added: 2026-09-25
+reviewed: 2026-10-16

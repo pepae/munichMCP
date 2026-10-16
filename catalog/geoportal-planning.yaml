@@ -1,0 +1,38 @@
+# GeoPortal München (WFS/WMS open geodata)
+id: geoportal-planning
+name: GeoPortal München (WFS/WMS open geodata)
+description: "GeoPortal München layers used for address reports: districts, zoning plan outlines, Milieuschutz areas, resident parking,
+  low-emission zone, solar potential."
+publisher: Landeshauptstadt München, GeodatenService
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://geoportal.muenchen.de/portal/opendata/
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/address.ts
+  source_id: geoportal
+refresh: daily
+questions:
+  - What applies at Wörthstraße 10?
+checks:
+  - type: wfs
+    layer: gsm_wfs:vablock_stadtbezirk
+    min_features: 25
+  - type: wfs
+    layer: gsm_wfs:vagrund_baug_umgriff_opendata
+    min_features: 100
+  - type: tool
+    name: "known answer: Marienplatz 8 is in district 1"
+    tool: address_report
+    args:
+      address: Marienplatz 8
+    expect: "District: 0?1 Altstadt"
+  - type: tool
+    name: "known answer: Wörthstraße 10 is in a Milieuschutz area"
+    tool: address_report
+    args:
+      address: Wörthstraße 10
+    expect: "Milieuschutz: YES"
+added: 2026-09-25
+reviewed: 2026-10-16

@@ -1,0 +1,30 @@
+# Mobilitätsreferat open geodata (sharing zones, parking, charging, mobility points)
+id: mobility-zones
+name: Mobilitätsreferat open geodata (sharing zones, parking, charging, mobility points)
+description: E-scooter and bike-sharing no-riding and no-parking zones, geofences and parking areas, EV charging and mobility points.
+publisher: Landeshauptstadt München, Mobilitätsreferat
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/organization/mobilitaetsreferat
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/mobility.ts
+  source_id: mobility
+refresh: daily
+questions:
+  - Can I park my e-scooter at Odeonsplatz?
+checks:
+  - type: wfs
+    layer: mor_wfs:ruhver_mim_abstellverbot_ts
+    min_features: 10
+  - type: wfs
+    layer: mor_wfs:ruhver_mim_abstellfl_ts
+    min_features: 50
+  - type: tool
+    tool: mobility_rules_at
+    args:
+      address: Odeonsplatz
+    expect: E-scooters
+added: 2026-09-25
+reviewed: 2026-10-16

@@ -1,0 +1,31 @@
+# P+R Park & Ride GmbH: P+R and B+R sites, occupancy forecasts
+id: park-and-ride
+name: "P+R Park & Ride GmbH: P+R and B+R sites, occupancy forecasts"
+description: P+R and B+R sites with spaces and prices.
+publisher: P+R Park & Ride GmbH München
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/organization/p-r-park-ride-gmbh-muenchen
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/places.ts
+  source_id: parkRide
+refresh: monthly
+questions:
+  - Where can I park and ride near the U3?
+checks:
+  - type: ckan
+    dataset: p-r-anlagen-muenchen
+    max_age_days: 730
+    licence_id: dl-by-de/2.0
+  - type: tool
+    tool: find_nearby
+    args:
+      category: park_and_ride
+      lat: 48.1
+      lon: 11.52
+      radius_m: 5000
+    expect: P\+R
+added: 2026-09-25
+reviewed: 2026-10-16

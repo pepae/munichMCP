@@ -1,0 +1,34 @@
+# Ordentliche Erträge und Aufwendungen der Produkte der LHM (city budget results by product)
+id: city-budget
+name: Ordentliche Erträge und Aufwendungen der Produkte der LHM (city budget results by product)
+description: Ordinary income and expenses of about 200 city products per department since 2018.
+publisher: Landeshauptstadt München, Stadtkämmerei
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/dataset/ordentliche-ertraege-und-aufwendungen-produkte-der-lhm
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/budget.ts
+  source_id: budget
+refresh: yearly
+questions:
+  - What does Munich spend on fire protection?
+checks:
+  - type: ckan
+    dataset: ordentliche-ertraege-und-aufwendungen-produkte-der-lhm
+    max_age_days: 500
+    columns:
+      - produkt
+      - referat
+      - jahr
+      - ordentliche ertraege rechnungsergebnis
+      - ordentliche aufwendungen rechnungsergebnis
+    licence_id: dl-by-de/2.0
+  - type: tool
+    tool: city_budget
+    args:
+      query: Brandschutz
+    expect: Brandschutz
+added: 2026-09-25
+reviewed: 2026-10-16

@@ -73,14 +73,6 @@ export const SOURCES = {
     access: "tolerated-unofficial",
     notes: "Cached aggressively. An official munichMCP would use an official MVG/MVV realtime feed.",
   },
-  mvvGtfs: {
-    id: "mvvGtfs",
-    name: "MVV Soll-Fahrplandaten (GTFS) and Haltestellenliste",
-    publisher: "Münchner Verkehrs- und Tarifverbund (MVV)",
-    license: "CC BY 4.0",
-    url: "https://www.mvv-muenchen.de/fahrplanauskunft/fuer-entwickler/opendata/index.html",
-    access: "open-data",
-  },
   ris: {
     id: "ris",
     name: "Ratsinformationssystem München (RSS feeds)",
@@ -88,14 +80,6 @@ export const SOURCES = {
     license: DL_BY,
     url: "https://risi.muenchen.de",
     access: "open-data",
-  },
-  oparl: {
-    id: "oparl",
-    name: "München Transparent (OParl API)",
-    publisher: "München Transparent / Open Knowledge Lab München",
-    license: "Open data from the RIS, republished",
-    url: "https://www.muenchen-transparent.de/infos/api",
-    access: "public-api",
   },
   roadworks: {
     id: "roadworks",

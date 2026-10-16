@@ -1,0 +1,84 @@
+name: source doctor
+
+# Weekly: run every source's health checks against the public server (no AI).
+# If anything is degraded or failing and ANTHROPIC_API_KEY is set, the source
+# doctor agent diagnoses each problem and opens repair pull requests or issues.
+# A human approves every pull request.
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # Mondays 04:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: source-doctor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      problems: ${{ steps.run.outputs.problems }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Run health checks
+        id: run
+        run: |
+          mkdir -p health
+          npm run check-sources -- --md health/report.md --json health/report.json || status=$?
+          cat health/report.md >> "$GITHUB_STEP_SUMMARY"
+          echo "problems=$([ "${status:-0}" != "0" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: health-report
+          path: health/
+
+  repair:
+    needs: check
+    if: needs.check.outputs.problems == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check configuration
+        id: cfg
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then echo "ANTHROPIC_API_KEY not set; the report above is the result."; echo "skip=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.skip != 'true'
+      - uses: actions/download-artifact@v4
+        if: steps.cfg.outputs.skip != 'true'
+        with:
+          name: health-report
+          path: health/
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.skip != 'true'
+        with:
+          node-version: 24
+          cache: npm
+      - name: Run the source doctor agent
+        if: steps.cfg.outputs.skip != 'true'
+        run: |
+          npm ci
+          npm install -g @anthropic-ai/claude-code
+          git config user.name "munichmcp-source-doctor"
+          git config user.email "source-doctor@users.noreply.github.com"
+          claude -p "$(cat agents/source-doctor.md)
+
+          The report of this run is in health/report.json and health/report.md." \
+            --model claude-opus-5-5 \
+            --allowedTools "Read,Write,Edit,Glob,Grep,WebFetch,Bash(npm run *),Bash(npm ci),Bash(npm test),Bash(npx tsx *),Bash(node *),Bash(curl *),Bash(git *),Bash(gh pr *),Bash(gh issue *),Bash(sleep *),Bash(kill *)" \
+            --max-turns 120

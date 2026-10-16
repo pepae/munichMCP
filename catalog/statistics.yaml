@@ -1,0 +1,34 @@
+# Statistisches Amt München: Indikatorenatlas and Monatszahlen
+id: statistics
+name: "Statistisches Amt München: Indikatorenatlas and Monatszahlen"
+description: "Statistisches Amt: about 100 datasets of indicators by district (Indikatorenatlas) and monthly city figures."
+publisher: Landeshauptstadt München, Statistisches Amt
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/organization/statistisches-amt
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/stats.ts
+  source_id: stats
+refresh: monthly
+questions:
+  - Which district has the most single-person households?
+checks:
+  - type: ckan
+    dataset: monatszahlen-bevoelkerung
+    max_age_days: 120
+    columns:
+      - MONATSZAHL
+      - AUSPRAEGUNG
+      - JAHR
+      - MONAT
+      - WERT
+    licence_id: dl-by-de/2.0
+  - type: tool
+    tool: district_stats
+    args:
+      dataset: monatszahlen-verkehrsunfaelle
+    expect: Verkehrsunf
+added: 2026-09-25
+reviewed: 2026-10-16

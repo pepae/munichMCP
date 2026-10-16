@@ -1,0 +1,45 @@
+name: ci
+
+# Every pull request (including the ones agents open): typecheck, tests, build,
+# catalog validation, and the live health checks of any source the PR touches,
+# run against a local server built from the PR.
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run catalog:validate
+
+      - name: Health checks for changed sources
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          ids=$(git diff --name-only "origin/${BASE_REF}...HEAD" -- 'catalog/*.yaml' | xargs -r -n1 basename | sed 's/\.yaml$//' | paste -sd, -)
+          if [ -z "$ids" ]; then echo "No source manifests changed."; exit 0; fi
+          echo "Checking: $ids"
+          LAZY_DATA=1 HEALTH_INTERVAL_HOURS=0 COLLECTOR_INTERVAL_HOURS=0 PORT=8420 PUBLIC_URL=http://localhost:8420 node dist/server.js > server.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://localhost:8420/health >/dev/null && break; sleep 1; done
+          npm run check-sources -- --url http://localhost:8420/mcp --only "$ids" --md health.md || status=$?
+          cat health.md >> "$GITHUB_STEP_SUMMARY"
+          exit ${status:-0}

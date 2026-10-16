@@ -1,0 +1,23 @@
+# DWD pollen forecast
+id: dwd-pollen
+name: DWD pollen forecast
+description: DWD pollen forecast for the Munich part-region.
+publisher: Deutscher Wetterdienst (DWD)
+licence: DWD open data
+homepage: https://opendata.dwd.de/climate_environment/health/alerts/
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/environment.ts
+  source_id: dwdPollen
+refresh: daily
+questions:
+  - Is the birch pollen bad today?
+checks:
+  - type: http
+    name: pollen file contains Munich's region
+    url: https://opendata.dwd.de/climate_environment/health/alerts/s31fg.json
+    expect_text: '"partregion_id": ?121'
+added: 2026-09-25
+reviewed: 2026-10-16

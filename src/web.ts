@@ -1,5 +1,8 @@
 import { marked } from "marked";
 import { config } from "./config.js";
+import { catalog } from "./catalog/catalog.js";
+import type { HealthReport } from "./catalog/health.js";
+import type { Proposal } from "./catalog/proposals.js";
 import { SOURCES } from "./lib/sources.js";
 import { outsideCode, wiki } from "./sources/wiki.js";
 
@@ -22,7 +25,7 @@ nav a{margin-right:14px}`;
 function layout(title: string, body: string): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><style>${CSS}</style></head><body><main>
-<nav><a href="/">munichMCP</a><a href="/wiki">Wiki</a><a href="https://github.com/pepae/munichMCP">GitHub</a></nav>${body}
+<nav><a href="/">munichMCP</a><a href="/wiki">Wiki</a><a href="/status">Status</a><a href="https://github.com/pepae/munichMCP">GitHub</a></nav>${body}
 <p class="muted" style="margin-top:48px">Unofficial project, not affiliated with the Landeshauptstadt München. Data from the sources listed, under their licences.</p>
 </main></body></html>`;
 }
@@ -48,7 +51,7 @@ export function renderLanding(): string {
 <li>Can I park my e-scooter at Odeonsplatz?</li>
 <li>Can I swim in the Isar at the Flaucher today?</li>
 <li>What do I need to register my new address, and can I do it online?</li></ul>
-<h2>Data sources</h2><table><tr><th>Source</th><th>Publisher</th><th>Licence</th></tr>${rows}</table>
+<h2>Data sources</h2><p>Every source is described in a manifest and checked automatically; see the <a href="/status">status page</a>. Suggest a new one with the <code>propose_data_source</code> tool or a GitHub issue.</p><table><tr><th>Source</th><th>Publisher</th><th>Licence</th></tr>${rows}</table>
 <h2>Wiki</h2><p>The <a href="/wiki">munichMCP wiki</a> (${wiki.size} pages) is a cross-linked Markdown knowledge base compiled by maintainer agents from primary sources and refreshed continuously.</p>`,
   );
 }
@@ -87,4 +90,33 @@ export function renderWikiIndex(notice?: string): string {
     .map(([t, ps]) => `<h2>${esc(t)}</h2><ul>${ps.map((p) => `<li><a href="/wiki/${esc(p.slug)}">${esc(p.title)}</a>${p.summary ? ` <span class="muted">${esc(p.summary)}</span>` : ""}</li>`).join("")}</ul>`)
     .join("");
   return layout("munichMCP wiki", `<h1>munichMCP wiki</h1>${notice ? `<p class="card">${esc(notice)}</p>` : ""}<p class="muted">${pages.length} pages, maintained by agents from primary sources. Start with <a href="/wiki/overview">Overview</a>.</p>${body}`);
+}
+
+
+const DOT: Record<string, string> = { ok: "#2b8a3e", degraded: "#b35c00", failing: "#c92a2a" };
+
+/** Public status page: health of every catalog source, from the latest automatic checks. */
+export function renderStatus(report: HealthReport | undefined, proposals: Proposal[]): string {
+  const health = new Map(report?.sources.map((s) => [s.id, s]) ?? []);
+  const rank = (id: string) => ({ failing: 0, degraded: 1, ok: 2 })[health.get(id)?.status ?? "ok"] ?? 3;
+  const rows = [...catalog]
+    .sort((a, b) => rank(a.id) - rank(b.id) || a.name.localeCompare(b.name))
+    .map((m) => {
+      const h = health.get(m.id);
+      const failed = h?.checks.filter((c) => !c.ok) ?? [];
+      const state = h ? `<span style="color:${DOT[h.status]};font-weight:600">${h.status}</span>` : `<span class="muted">not checked</span>`;
+      return `<tr><td><strong>${esc(m.name)}</strong><br><span class="muted">${esc(m.publisher)} · ${esc(m.licence)}</span></td><td>${state}</td><td>${h ? `${h.checks.filter((c) => c.ok).length}/${h.checks.length}` : ""}${failed.length ? `<br><span class="muted">${failed.map((c) => esc(`${c.name}: ${c.detail}`)).join("<br>")}</span>` : ""}</td><td>${m.implementation.kind === "code" ? "code" : `<span class="pill">YAML only</span>`}</td></tr>`;
+    })
+    .join("");
+  const open = proposals.filter((p) => p.status === "new" || p.status === "in_progress" || p.status === "pr_opened");
+  return layout(
+    "Status · munichMCP",
+    `<h1>Data source status</h1>
+<p class="muted">${report ? `Checked ${esc(report.checked_at.slice(0, 16).replace("T", " "))} UTC: ${report.summary.ok} ok, ${report.summary.degraded} degraded, ${report.summary.failing} failing.` : "No check has run yet."} Checks run daily without any AI: is the source reachable, has its licence or schema changed, is it fresh, and do known questions still get the known answers. A weekly agent turns failures into repair pull requests that a maintainer approves.</p>
+<table><tr><th>Source</th><th>Health</th><th>Checks</th><th>Integration</th></tr>${rows}</table>
+<h2>Proposed sources</h2>
+${open.length ? `<table><tr><th>Proposal</th><th>Status</th><th>Received</th></tr>${open.map((p) => `<tr><td>${esc(p.name)}<br><span class="muted">${esc(p.url)}</span></td><td>${esc(p.status)}${p.pr_url ? `<br><a href="${esc(p.pr_url)}">pull request</a>` : ""}</td><td>${esc(p.created.slice(0, 10))}</td></tr>`).join("")}</table>` : `<p class="muted">No open proposals.</p>`}
+<p>Propose a source with the <code>propose_data_source</code> tool from any connected assistant, or open a "New data source" issue on GitHub. Never send API keys: say whether a source needs one and a maintainer arranges it through the deployment's secret store.</p>
+<p class="muted">Machine-readable: <a href="/status.json">/status.json</a></p>`,
+  );
 }

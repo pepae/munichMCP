@@ -14,7 +14,7 @@ sources:
   - https://opendata.muenchen.de/dataset/stadtratswahl-2026-ergebnisse-muenchen
   - https://opendata.muenchen.de/dataset/ordentliche-ertraege-und-aufwendungen-produkte-der-lhm
   - https://opendata.muenchen.de/dataset/termine-buergerversammlungen-muenchen
-updated: 2026-10-05
+updated: 2026-10-16
 updated_by: maintainer-agent
 ---
 
@@ -31,7 +31,6 @@ munichMCP combines sources that anyone can use without asking. This page records
 | Service directory corpus | it@M (Hugging Face) | MIT | `search_city_services` |
 | RIS RSS feeds | Direktorium | dl-de/by-2.0 (open data portal) | `council_search`, wiki collector |
 | machmuenchenbesser.de Open311 | Baureferat | CC0 | `damage_reports_near` |
-| MVV GTFS timetables | MVV | CC BY 4.0 | planned timetables |
 | MyRadl GBFS | nextbike | CC0 | live bike sharing |
 | DWD weather (Bright Sky), pollen | Deutscher Wetterdienst | open data | `weather_air_pollen` |
 | Air quality | Umweltbundesamt / LfU | dl-de/by-2.0 | `weather_air_pollen` |
@@ -42,6 +41,8 @@ munichMCP combines sources that anyone can use without asking. This page records
 | Budget results per product since 2018 | Stadtkämmerei | dl-de/by-2.0 | `city_budget` |
 | Residents' assembly dates and venues | Direktorium | dl-de/by-2.0 | `citizens_assemblies` |
 | Basemap tiles | BKG basemap.de | CC BY 4.0 | maps |
+
+Every source has a manifest in the repository's `catalog/` folder (publisher, licence, health checks) and is checked daily; the results are on the [status page](https://munichmcp.duckdns.org/status). Three sources are integrated from a manifest alone, without code: public Wi-Fi, the Ratschbankerl benches and the barrier-free glass containers.
 
 ## Public but not openly licensed (used carefully)
 
@@ -63,7 +64,7 @@ munichMCP combines sources that anyone can use without asking. This page records
 
 ## Gaps an official city MCP could close
 
-1. An official real-time feed from MVG/MVV.
+1. An official real-time feed from MVG/MVV. (MVV's planned timetables are open data under CC BY 4.0 but not used yet; they would be the natural fallback for departures.)
 2. An agreement (or open licence) for the Mietspiegel Wohnlagen lookup.
 3. A licensed Isar gauge feed from the LfU.
 4. Opening SWM bath occupancy and P+R occupancy as open data.

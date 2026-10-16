@@ -1,0 +1,27 @@
+# Deutscher Wetterdienst open data via Bright Sky
+id: dwd-weather
+name: Deutscher Wetterdienst open data via Bright Sky
+description: Deutscher Wetterdienst weather and warnings via the Bright Sky API.
+publisher: Deutscher Wetterdienst (DWD), API by Bright Sky
+licence: DWD open data (GeoNutzV / CC BY 4.0 compatible attribution)
+homepage: https://brightsky.dev
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/environment.ts
+  source_id: dwd
+refresh: hourly
+questions:
+  - Will it rain in Munich today?
+checks:
+  - type: http
+    name: Bright Sky reachable
+    url: https://api.brightsky.dev/current_weather?lat=48.137&lon=11.575
+    expect_text: weather
+  - type: tool
+    tool: weather_air_pollen
+    args: {}
+    expect: Weather
+added: 2026-09-25
+reviewed: 2026-10-16

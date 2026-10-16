@@ -1,0 +1,23 @@
+# Umweltbundesamt air quality data
+id: uba-air
+name: Umweltbundesamt air quality data
+description: Umweltbundesamt air quality measurements at Munich stations.
+publisher: Umweltbundesamt (UBA) with Bayerisches Landesamt für Umwelt
+licence: dl-de/by-2.0
+homepage: https://www.umweltbundesamt.de/daten/luft/luftdaten
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/environment.ts
+  source_id: uba
+refresh: hourly
+questions:
+  - How is the air quality today?
+checks:
+  - type: http
+    name: UBA API reachable
+    url: https://luftdaten.umweltbundesamt.de/api/air-data/v3/components/json
+    expect_text: PM10
+added: 2026-09-25
+reviewed: 2026-10-16

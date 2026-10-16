@@ -1,0 +1,28 @@
+# GeoPortal München address search index
+id: address-index
+name: GeoPortal München address search index
+description: The city's address search index behind its map portal (about 162,000 addresses), used to geocode every address.
+publisher: Landeshauptstadt München, GeodatenService
+licence: Public search service of the GeoPortal (address data published as open data under dl-de/by-2.0)
+homepage: https://geoportal.muenchen.de/
+access: public-api
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/lib/geocode.ts
+  source_id: addressIndex
+refresh: live
+questions:
+  - Where exactly is Lindwurmstraße 50?
+checks:
+  - type: http
+    name: search index reachable
+    url: https://geoportal.muenchen.de/search/p1_adressen_4326/_search?q=Marienplatz&size=1
+    expect_text: '"hits"'
+  - type: tool
+    tool: find_address
+    args:
+      query: Marienplatz 8
+    expect: Marienplatz 8
+added: 2026-09-25
+reviewed: 2026-10-16

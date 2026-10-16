@@ -1,0 +1,44 @@
+# A source added without code: the generic adapter turns this file into
+# the find_nearby category "chat_bench".
+id: ratschbankerl
+name: Ratschbankerl (benches for a chat)
+description: >-
+  One bench per district marked "Ratschbankerl": whoever sits there invites others to talk. An initiative of the
+  social department against loneliness.
+publisher: Landeshauptstadt München, Sozialreferat
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/dataset/ratschbankerl-in-muenchen
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: ckan-csv-points
+  dataset: ratschbankerl-in-muenchen
+  category:
+    id: chat_bench
+    label: Ratschbankerl (benches for a chat, against loneliness)
+    group: social
+  fields:
+    name: "Ratschbankerl {standort}"
+    address: standort
+    url: sadb-poi
+    lat: latitude
+    lon: longitude
+    details:
+      where: lagehinweis
+      district: stadtbezirk-nr
+      social_region: sozialregion
+refresh: rarely (one bench per district)
+questions:
+  - Where can I sit and talk to someone in my neighbourhood?
+checks:
+  - type: ckan
+    dataset: ratschbankerl-in-muenchen
+    licence_id: dl-by-de/2.0
+    columns: [standort, latitude, longitude, sadb-poi]
+  - type: tool
+    name: "known answer: a Ratschbankerl in the Altstadt"
+    tool: find_nearby
+    args: { category: chat_bench, address: Marienplatz, radius_m: 3000 }
+    expect: Ratschbankerl
+added: 2026-10-16
+reviewed: 2026-10-16

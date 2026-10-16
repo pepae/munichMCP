@@ -7,7 +7,10 @@ import { timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import { config } from "./config.js";
 import { createMaintainerServer, createPublicServer } from "./mcp.js";
-import { renderLanding, renderWikiIndex, renderWikiPage } from "./web.js";
+import { renderLanding, renderStatus, renderWikiIndex, renderWikiPage } from "./web.js";
+import { catalog } from "./catalog/catalog.js";
+import { latestReport, scheduleHealthChecks } from "./catalog/health.js";
+import { listProposals } from "./catalog/proposals.js";
 import { warmUp, scheduleRefresh } from "./warmup.js";
 import { scheduleCollector } from "./sources/wiki-collector.js";
 import { wiki } from "./sources/wiki.js";
@@ -77,6 +80,14 @@ app.get("/playground", (_req, res) => {
     if (err && !res.headersSent) res.status(404).send("Playground not built (npm run build:ui).");
   });
 });
+app.get("/status", async (_req, res) => {
+  res.type("html").send(renderStatus(await latestReport(), await listProposals()));
+});
+app.get("/status.json", async (_req, res) => {
+  const report = await latestReport();
+  const proposals = (await listProposals()).map(({ id, name, url, status, created, pr_url }) => ({ id, name, url, status, created, pr_url }));
+  res.json({ sources: catalog.length, report, proposals });
+});
 app.get("/wiki", (_req, res) => res.type("html").send(renderWikiIndex()));
 app.get(/^\/wiki\/(.+)$/, (req, res) => {
   const slug = decodeURIComponent((req.params as unknown as string[])[0]);
@@ -96,6 +107,7 @@ async function main() {
     scheduleRefresh();
   }
   scheduleCollector(config.collectorIntervalHours);
+  scheduleHealthChecks(config.healthIntervalHours);
 }
 
 main().catch((e) => {

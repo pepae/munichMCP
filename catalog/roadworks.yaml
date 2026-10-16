@@ -1,0 +1,28 @@
+# Baustellen: temporäre Einschränkungen beim Gehen, Fahren und Parken
+id: roadworks
+name: "Baustellen: temporäre Einschränkungen beim Gehen, Fahren und Parken"
+description: Construction sites and temporary no-parking zones for the next four weeks.
+publisher: Landeshauptstadt München, Mobilitätsreferat
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/dataset/baustellen_4_weeks_opendata
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/roadworks.ts
+  source_id: roadworks
+refresh: hourly
+questions:
+  - Are there roadworks on Leopoldstraße?
+checks:
+  - type: wfs
+    layer: mor_wfs:baustellen_opendata
+    min_features: 50
+  - type: tool
+    tool: roadworks_near
+    args:
+      address: Leopoldstraße 50
+      radius_m: 500
+    expect: roadworks
+added: 2026-09-25
+reviewed: 2026-10-16

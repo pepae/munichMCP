@@ -1,0 +1,38 @@
+# A source added without code: the generic adapter turns this map layer into
+# the find_nearby category "accessible_glass_container".
+id: accessible-glass-containers
+name: Barrier-free glass containers
+description: Glass recycling containers that can be used from a wheelchair (GeoPortal layer of the waste management company AWM).
+publisher: Landeshauptstadt München, GeodatenService (data of AWM and its contractors)
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/dataset/awm_container_barrierefrei
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: wfs-points
+  layer: gsm_wfs:awm_container_barrierefrei
+  category:
+    id: accessible_glass_container
+    label: Barrier-free glass containers (usable from a wheelchair)
+    group: everyday
+  fields:
+    name: "Barrier-free glass container {adresse}"
+    address: adresse
+    details:
+      white_glass: glas_weiss
+      green_glass: glas_gruen
+      brown_glass: glas_braun
+refresh: daily
+questions:
+  - Where is the nearest glass container I can use from a wheelchair?
+checks:
+  - type: wfs
+    layer: gsm_wfs:awm_container_barrierefrei
+    min_features: 1
+  - type: tool
+    name: "known answer: a barrier-free container in the city"
+    tool: find_nearby
+    args: { category: accessible_glass_container, address: Marienplatz, radius_m: 15000 }
+    expect: Barrier-free glass container
+added: 2026-10-16
+reviewed: 2026-10-16

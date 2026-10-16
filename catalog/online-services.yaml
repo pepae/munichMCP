@@ -1,0 +1,23 @@
+# Liste aller verfügbaren Onlinedienste der Landeshauptstadt München
+id: online-services
+name: Liste aller verfügbaren Onlinedienste der Landeshauptstadt München
+description: List of all online services of the City of Munich with links.
+publisher: Landeshauptstadt München, IT-Referat
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/dataset/liste-aller-verfuegbaren-onlinedienste-der-landeshauptstadt-muenchen
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/services.ts
+  source_id: onlineServices
+refresh: weekly
+questions:
+  - Can I apply for a resident parking permit online?
+checks:
+  - type: ckan
+    dataset: liste-aller-verfuegbaren-onlinedienste-der-landeshauptstadt-muenchen
+    max_age_days: 400
+    licence_id: dl-by-de/2.0
+added: 2026-09-25
+reviewed: 2026-10-16

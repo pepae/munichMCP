@@ -1,0 +1,28 @@
+# Münchner Verwaltungs-Dienstleistungen (Dienstleistungsfinder corpus)
+id: city-services
+name: Münchner Verwaltungs-Dienstleistungen (Dienstleistungsfinder corpus)
+description: About 1,450 official service articles of the city's service finder (documents, fees, opening hours, responsible office).
+publisher: Landeshauptstadt München, it@M
+licence: MIT (Hugging Face dataset it-at-m/munich-public-services)
+homepage: https://huggingface.co/datasets/it-at-m/munich-public-services
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/services.ts
+  source_id: services
+refresh: weekly
+questions:
+  - How do I register my new address?
+checks:
+  - type: http
+    name: dataset on Hugging Face
+    url: https://huggingface.co/api/datasets/it-at-m/munich-public-services
+    expect_text: munich-public-services
+  - type: tool
+    tool: search_city_services
+    args:
+      query: Wohnsitz anmelden
+    expect: stadt\.muenchen\.de
+added: 2026-09-25
+reviewed: 2026-10-16

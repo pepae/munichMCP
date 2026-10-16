@@ -1,0 +1,30 @@
+# Mietspiegel für München 2025
+id: mietspiegel
+name: Mietspiegel für München 2025
+description: Official Munich rent index 2025, computed with the published method and verified against 780 official values.
+publisher: Landeshauptstadt München, Sozialreferat
+licence: Official publication (methodology and tables), reproduced for calculation
+homepage: https://2025.mietspiegel-muenchen.de/
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/mietspiegel.ts
+  source_id: mietspiegel
+refresh: every two years
+questions:
+  - Is 1,540 euros fair for 70 m² built in 1965 in Haidhausen?
+checks:
+  - type: http
+    name: official rent index site
+    url: https://2025.mietspiegel-muenchen.de/
+  - type: tool
+    name: "known answer: 70 m², 1965, zentral gut = 961.80 euros"
+    tool: estimate_rent
+    args:
+      living_area_m2: 70
+      year_built: 1965
+      wohnlage: zentral_gut
+    expect: 961[.,]80
+added: 2026-09-25
+reviewed: 2026-10-16

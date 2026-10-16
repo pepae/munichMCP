@@ -1,0 +1,23 @@
+# Rathaus Umschau (official press releases of the City of Munich)
+id: press-releases
+name: Rathaus Umschau (official press releases of the City of Munich)
+description: The city's official press releases (Rathaus Umschau), collected daily into the wiki inbox.
+publisher: Landeshauptstadt München, Presse- und Informationsamt
+licence: Press releases may be reprinted with source attribution (city imprint)
+homepage: https://ru.muenchen.de
+access: public-api
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/wiki-collector.ts
+  source_id: pressReleases
+refresh: daily
+questions:
+  - What did the council decide this week?
+checks:
+  - type: http
+    name: press release feed
+    url: https://ru.muenchen.de/rss
+    expect_text: <item>
+added: 2026-09-25
+reviewed: 2026-10-16

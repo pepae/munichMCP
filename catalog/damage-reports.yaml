@@ -1,0 +1,29 @@
+# machmuenchenbesser.de citizen damage reports (Open311 GeoReport v2)
+id: damage-reports
+name: machmuenchenbesser.de citizen damage reports (Open311 GeoReport v2)
+description: Citizen reports of damage (street lights, potholes, litter) from the city's reporting platform (Open311).
+publisher: Landeshauptstadt München, Baureferat
+licence: CC0 1.0
+homepage: https://machmuenchenbesser.de
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/reports.ts
+  source_id: damageReports
+refresh: live
+questions:
+  - What has been reported broken near Leopoldstraße 50?
+checks:
+  - type: http
+    name: Open311 API
+    url: https://machmuenchenbesser.de/api/georeport/v2/services.json
+    expect_text: service_code
+  - type: tool
+    tool: damage_reports_near
+    args:
+      address: Leopoldstraße 50
+      radius_m: 1500
+    expect: citizen report
+added: 2026-09-25
+reviewed: 2026-10-16

@@ -1,0 +1,42 @@
+# A source added without code: the generic adapter turns this file into
+# the find_nearby category "public_wifi".
+id: public-wifi
+name: Free public Wi-Fi (M-WLAN) on public squares
+description: Locations of the city's free M-WLAN hotspots on public squares (city list of October 2023).
+publisher: Landeshauptstadt München, IT-Referat
+licence: Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2.0)
+homepage: https://opendata.muenchen.de/dataset/wlan-standorte-lhm-muenchen
+access: open-data
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: ckan-csv-points
+  dataset: wlan-standorte-lhm-muenchen
+  resource: ffentliche Pl
+  category:
+    id: public_wifi
+    label: Free public Wi-Fi (M-WLAN hotspots on public squares, city list of Oct 2023)
+    group: everyday
+  fields:
+    name: "M-WLAN {adresse}"
+    address: adresse
+    lat: latitude
+    lon: longitude
+    details:
+      type: typ
+      access_points: anzahl
+refresh: when the city publishes a new list
+questions:
+  - Where can I get free Wi-Fi near Marienplatz?
+checks:
+  - type: ckan
+    dataset: wlan-standorte-lhm-muenchen
+    licence_id: dl-by-de/2.0
+    resource: ffentliche Pl
+    columns: [typ, adresse, anzahl, latitude, longitude]
+  - type: tool
+    name: "known answer: hotspots near Marienplatz"
+    tool: find_nearby
+    args: { category: public_wifi, address: Marienplatz, radius_m: 1500 }
+    expect: M-WLAN
+added: 2026-10-02
+reviewed: 2026-10-16

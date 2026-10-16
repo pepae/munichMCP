@@ -1,0 +1,27 @@
+# Hochwassernachrichtendienst / Gewässerkundlicher Dienst Bayern (gauge München 16005701)
+id: isar-gauges
+name: Hochwassernachrichtendienst / Gewässerkundlicher Dienst Bayern (gauge München 16005701)
+description: Isar water level, discharge and temperature at the Munich gauge (Bavarian flood information service).
+publisher: Bayerisches Landesamt für Umwelt (LfU)
+licence: Read from the public HND/GKD web tables; CC BY 4.0 formally covers the GKD download data
+homepage: https://www.hnd.bayern.de/pegel/isar/muenchen-16005701
+access: public-api
+owner: "@munichmcp/maintainers"
+implementation:
+  kind: code
+  module: src/sources/environment.ts
+  source_id: gkd
+refresh: 15 minutes
+questions:
+  - Is the Isar warm enough for a swim today?
+checks:
+  - type: http
+    name: gauge page
+    url: https://www.hnd.bayern.de/pegel/isar/muenchen-16005701
+    expect_text: M(ü|&uuml;)nchen
+  - type: tool
+    tool: isar_conditions
+    args: {}
+    expect: Isar
+added: 2026-09-25
+reviewed: 2026-10-16
