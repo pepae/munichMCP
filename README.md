@@ -10,7 +10,16 @@ It is an **unofficial** proposal for an official city MCP and is not affiliated 
 
 - Live server: `https://munichmcp.duckdns.org/mcp` (Streamable HTTP, no auth, read-only)
 - Browser playground: `https://munichmcp.duckdns.org/playground`
+- Source health: `https://munichmcp.duckdns.org/status`
 - Wiki: `https://munichmcp.duckdns.org/wiki`
+
+## Munich, headless
+
+People have started to ask instead of search. ChatGPT and Claude already let anyone add apps and connectors, and both have voice modes. For more and more people the assistant is becoming the first stop for every question, including questions about their city. If the city's data is not in the assistant, the assistant guesses.
+
+The idea is a **headless city**: the city provides data and services through one open interface (MCP), and every assistant is a front end. ChatGPT, Claude, the city's own MUCGPT, voice assistants. The first people this helps are the ones who never used a city website: older residents, people with visual or motor impairments, people who do not read German well, anyone who avoids forms and portals. Talking to an assistant is the first interface that asks nothing of them.
+
+This is early, on purpose. Most residents have not added an app to an assistant yet. But the slow part is not the interface. It is finding the sources, clearing their licences, keeping the data correct and earning trust. That work has to start now so the layer is ready when people start talking to their city.
 
 ## See it in action
 
@@ -38,13 +47,14 @@ flowchart TB
 
   subgraph mcp["munichMCP"]
     direction LR
-    tools["26 read-only tools<br/>answers with sources<br/>and licences"] -. "ui:// view" .-> view["MCP Apps view<br/>maps, departure boards,<br/>rent calculator, charts"]
+    tools["28 tools<br/>answers with sources<br/>and licences"] -. "ui:// view" .-> view["MCP Apps view<br/>maps, departure boards,<br/>rent calculator, charts"]
     tools --- wiki["agent-maintained<br/>wiki"]
+    tools --- catalog["source catalog<br/>31 manifests,<br/>daily health checks"]
   end
 
   subgraph data["Official sources, cached for 30 seconds to a year"]
     direction LR
-    geo["GeoPortal München<br/>zoning, Milieuschutz,<br/>parking, addresses"] ~~~ portal["Open data portal<br/>facilities, statistics,<br/>elections, budget"] ~~~ transit["MVG and MVV<br/>live departures,<br/>timetables"] ~~~ lfu["Environment Agency<br/>noise and<br/>flood maps"] ~~~ more["DWD, UBA, Isar,<br/>council motions,<br/>city services"]
+    geo["GeoPortal München<br/>zoning, Milieuschutz,<br/>parking, addresses"] ~~~ portal["Open data portal<br/>facilities, statistics,<br/>elections, budget"] ~~~ transit["MVG<br/>live departures,<br/>journey planning"] ~~~ lfu["Environment Agency<br/>noise and<br/>flood maps"] ~~~ more["DWD, UBA, Isar,<br/>council motions,<br/>city services"]
   end
 
   hosts -- "MCP over HTTPS" --> mcp
@@ -65,11 +75,11 @@ flowchart TB
 | `city_budget` | Income and expenses of about 200 city services, per department and year since 2018, with cost per resident | Stadtkämmerei, Statistisches Amt |
 | `citizens_assemblies` | Dates and venues of the district residents' assemblies (Bürgerversammlungen), from an address or district | Direktorium, open data |
 | `find_address` | Geocoding with the city's official address index (162k addresses) | GeoPortal search, Photon fallback |
-| `find_nearby` | 30 categories of official facilities (drinking fountains, toilets, playgrounds, Kitas, libraries, pools, public Wi-Fi, P+R, EV charging, recycling, live MyRadl bikes, ...) | open data portal, GBFS |
+| `find_nearby` | 32 categories of official facilities (drinking fountains, toilets, playgrounds, Kitas, libraries, pools, public Wi-Fi, chat benches, barrier-free glass containers, P+R, EV charging, recycling, live MyRadl bikes, ...); three are defined only in YAML | open data portal, GBFS |
 | `roadworks_near` | Construction sites and temporary no-parking zones for the next 4 weeks | Mobilitätsreferat |
 | `mobility_rules_at` | E-scooter no-riding / no-parking zones, 100 m geofences, designated sharing areas | Mobilitätsreferat |
 | `damage_reports_near` | Citizen reports (street lights, potholes, ...) near an address | machmuenchenbesser.de Open311 (CC0) |
-| `departures`, `nearby_stops`, `plan_trip`, `transit_disruptions` | Live departures, journey planning, disruptions | MVG (unofficial, cached), MVV GTFS |
+| `departures`, `nearby_stops`, `plan_trip`, `transit_disruptions` | Live departures, journey planning, disruptions | MVG (unofficial, cached) |
 | `search_city_services`, `get_city_service` | 1,450 official service articles and 465 online services | it@M Hugging Face corpus, online services list |
 | `estimate_rent` | Mietspiegel 2025 comparative rent, verified against the official calculator | Mietspiegel für München 2025 |
 | `council_search` | City council and district committee motions | RIS RSS (+ archive) |
@@ -77,6 +87,8 @@ flowchart TB
 | `weather_air_pollen` | DWD weather and warnings, UBA air quality, DWD pollen | Bright Sky, UBA, DWD |
 | `find_statistics`, `district_stats` | ~100 official statistics datasets by district and month | Statistisches Amt |
 | `wiki_search`, `wiki_read`, `wiki_index` | Agent-maintained, cross-linked knowledge base | see below |
+| `data_sources` | Every source with publisher, licence and current health | source catalog |
+| `propose_data_source` | Suggest a new dataset or API; an agent prepares it, a human approves it | proposal inbox |
 | `about_munichmcp` | Sources, licences, caveats | |
 
 Every result names its sources with licence and retrieval time. See `wiki/sources/open-data-landschaft.md` for the full licence analysis, including what is deliberately **not** used.
@@ -86,6 +98,32 @@ Every result names its sources with licence and retrieval time. See `wiki/source
 ### What the city could open next
 
 Some of the most useful data is published but not under an open licence, so munichMCP does not use it: primary school catchment areas (Grundschulsprengel) and the zoning-plan layer with PDF links both require a separate agreement with the city; the results of the 2026 mayoral runoff are online but not on the open data portal; live departures come from MVG's unofficial (tolerated) API rather than an official open feed. Opening these would make the official version much better.
+
+## Self-maintaining sources
+
+The fair objection to any open data project: three months later half the sources are broken and nobody has time to add new ones. munichMCP is built to notice problems itself, prepare the fixes, and only ask a human to approve them.
+
+```mermaid
+flowchart LR
+  propose["proposal<br/>(assistant tool or<br/>GitHub issue)"] --> intake["intake agent<br/>licence gate, manifest,<br/>checks, verification"]
+  intake --> pr["pull request<br/>with evidence"]
+  checks["daily checks<br/>(no AI)"] --> status["/status"]
+  checks --> doctor["weekly source doctor<br/>(agent)"]
+  doctor --> pr
+  pr -- "maintainer approves" --> deploy["deploy, end-to-end tests,<br/>rollback on failure"]
+  deploy --> checks
+```
+
+- **Catalog.** Every source has a manifest in [`catalog/`](catalog/README.md): publisher, licence, example questions and health checks. Point datasets need nothing else; a generic adapter turns them into a nearby search ([`ratschbankerl.yaml`](catalog/ratschbankerl.yaml) is the whole integration of the city's chat benches).
+- **Checks, without AI.** Reachable? Licence changed? Columns renamed? Still fresh? And **known answers**: Marienplatz 8 is in district 1, the Flaucher is in the 100-year flood zone, 70 m² built in 1965 in a central good location costs 961.80 € under the Mietspiegel. They catch data that is silently wrong, not just sources that are down. The server runs them daily and publishes them at [`/status`](https://munichmcp.duckdns.org/status); `npm run check-sources` runs them anywhere.
+- **Proposals.** Anyone can suggest a source with the `propose_data_source` tool or the "New data source" issue form. A maintainer labels it `intake-agent`, and the [intake agent](agents/source-intake.md) checks the licence (and stops if the terms are closed), explores the data, writes the manifest and checks, verifies them against a local server and opens a pull request.
+- **Repairs.** Every Monday the [source doctor](agents/source-doctor.md) reads the failing checks, finds the cause (a yearly file renamed, a column renamed, a layer moved) and opens a repair pull request, or an issue when a human must decide, for example after a licence change. A repair only counts if every known answer comes out exactly as before.
+- **Humans approve, machines verify.** CI runs the tests and the live checks of every changed source on each pull request. Merging deploys automatically; the deploy rolls back if the new release is not healthy or the end-to-end tests fail.
+- **Credentials.** A manifest never contains a key, only the name of a secret (`auth.secret_env`). Proposals that contain anything that looks like a key are rejected.
+
+On the first run the checks found the city's monthly population figures not updated for 151 days, and two sources listed in the registry that no code used.
+
+The agent workflows stay inactive until the repository secrets are set: `ANTHROPIC_API_KEY` (agents), `MUNICHMCP_MAINTAINER_TOKEN` (proposal inbox and wiki), `DEPLOY_HOST`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS` (automatic deploys).
 
 ## The wiki (agent-maintained knowledge base)
 
@@ -130,14 +168,16 @@ npm run start:dev         # tsx src/server.ts on :8420
 npm run typecheck         # server and UI
 npm test                  # unit tests incl. 780 official Mietspiegel values
 npm run smoke             # end-to-end over MCP against localhost (or pass a URL)
+npm run catalog:validate  # source manifests: schema and consistency
+npm run check-sources     # health checks of every source (or --only <id> --url <mcp>)
 npm run demos             # re-record the README GIFs (needs Chrome or Edge and ffmpeg)
 ```
 
-Environment: `PORT`, `PUBLIC_URL`, `DATA_DIR`, `WIKI_MAINTAINER_TOKEN`, `COLLECTOR_INTERVAL_HOURS`, `MIETSPIEGEL_ENABLED` (set `0` to disable the rent tool), `ALLOWED_HOSTS`.
+Environment: `PORT`, `PUBLIC_URL`, `DATA_DIR`, `WIKI_MAINTAINER_TOKEN` (enables the maintainer endpoint), `COLLECTOR_INTERVAL_HOURS`, `HEALTH_INTERVAL_HOURS`, `CATALOG_DIR`, `MIETSPIEGEL_ENABLED` (set `0` to disable the rent tool), `ALLOWED_HOSTS`.
 
 ## Deploy
 
-`deploy/deploy.sh root@host` packs the tree, builds the Docker image on the host and restarts the container (bound to 127.0.0.1:8420). `deploy/nginx-munichmcp.conf` is the reverse proxy (TLS via certbot). Data (caches, live wiki with its git history) lives in `/opt/munichmcp/data`.
+`deploy/deploy.sh root@host` packs the tree, builds the Docker image on the host and restarts the container (bound to 127.0.0.1:8420). If the new container does not become healthy it switches back to the previous image; `deploy/rollback.sh root@host` does the same on demand. The `deploy` workflow runs this after CI passes on `main`, then the end-to-end tests against production. `deploy/nginx-munichmcp.conf` is the reverse proxy (TLS via certbot). Data (caches, live wiki with its git history, health reports, proposals) lives in `/opt/munichmcp/data`.
 
 ## Architecture
 
