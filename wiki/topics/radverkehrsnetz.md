@@ -31,4 +31,4 @@ The Mobilitätsreferat publishes the Radentscheid measures, fast cycle routes (*
 
 ## Related
 
-[[entities/stadtrat]] · [[topics/e-scooter-und-sharing]] · [[entities/mvg-mvv]]
+[[entities/stadtrat]], [[topics/e-scooter-und-sharing]], [[entities/mvg-mvv]]

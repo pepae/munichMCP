@@ -135,8 +135,8 @@ export function registerAddressTools(server: McpServer) {
 
       const cits = [...facts.citations, loc.citation, wohnlage?.citation, noise?.citation, flood?.citation, vote ? electionCitation(vote.fetchedAt) : undefined, works?.citation, mob?.citation, fountain?.citation, kitas?.citation];
       const markers = [
-        ...(stations ?? []).map((s) => ({ lat: s.lat, lon: s.lon, label: s.name, sublabel: `${s.transport_types.join(", ")} · ${fmtDistance(s.distance_m ?? 0)}`, color: "#1864ab" })),
-        ...[fountain, toilet, playground, glass, library, kitas].flatMap((n) => (n?.items ?? []).map((p) => ({ lat: p.lat, lon: p.lon, label: p.name, sublabel: `${n!.label.split(" (")[0]} · ${fmtDistance(p.distance_m)}`, color: "#2b8a3e" }))),
+        ...(stations ?? []).map((s) => ({ lat: s.lat, lon: s.lon, label: s.name, sublabel: `${s.transport_types.join(", ")} (${fmtDistance(s.distance_m ?? 0)})`, color: "#1864ab" })),
+        ...[fountain, toilet, playground, glass, library, kitas].flatMap((n) => (n?.items ?? []).map((p) => ({ lat: p.lat, lon: p.lon, label: p.name, sublabel: `${n!.label.split(" (")[0]}, ${fmtDistance(p.distance_m)}`, color: "#2b8a3e" }))),
       ];
       const cards = [
         facts.district && { title: "District", lines: [`${facts.district.number} ${facts.district.name}`, facts.district.district_part ? `Bezirksteil ${facts.district.district_part}` : ""] },

@@ -86,7 +86,7 @@ export function registerBudgetTools(server: McpServer) {
             ? {
                 kind: "bars",
                 title: single.name,
-                subtitle: `${single.department} · expenses per year (income in brackets)`,
+                subtitle: `${single.department}: expenses per year (income in brackets)`,
                 unit: "€",
                 rows: single.series.map((r) => ({ label: String(r.year), value: r.expense, display: `${money(r.expense)} (${money(r.income)})`, highlight: r.year === year })),
                 attribution: "Landeshauptstadt München, Stadtkämmerei (dl-de/by-2.0)",
@@ -119,7 +119,7 @@ export function registerBudgetTools(server: McpServer) {
           view: {
             kind: "bars",
             title: `${dep} ${year}`,
-            subtitle: `Expenses ${money(tot.expense)} · income ${money(tot.income)}`,
+            subtitle: `Expenses ${money(tot.expense)}, income ${money(tot.income)}`,
             unit: "€",
             rows: prods.slice(0, 20).map((p) => ({ label: p.product, value: p.expense, display: money(p.expense) })),
             attribution: "Landeshauptstadt München, Stadtkämmerei (dl-de/by-2.0)",
@@ -145,7 +145,7 @@ export function registerBudgetTools(server: McpServer) {
         view: {
           kind: "bars",
           title: `City of Munich budget ${year}`,
-          subtitle: `Income ${money(tot.income)} · expenses ${money(tot.expense)} · by department`,
+          subtitle: `Income ${money(tot.income)}, expenses ${money(tot.expense)}, by department`,
           unit: "€",
           rows: byDep.map((d) => ({ label: d.department, value: d.expense, display: money(d.expense) })),
           attribution: "Landeshauptstadt München, Stadtkämmerei (dl-de/by-2.0)",

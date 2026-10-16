@@ -52,4 +52,4 @@ Example: the Flaucher on the Isar lies in the 100-year flood area and in the des
 
 ## Related
 
-[[topics/mietspiegel]] · [[topics/milieuschutz]] · [[entities/isar]] · [[topics/baden-in-der-isar]]
+[[topics/mietspiegel]], [[topics/milieuschutz]], [[entities/isar]], [[topics/baden-in-der-isar]]

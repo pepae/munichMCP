@@ -38,4 +38,4 @@ Adopted by the full council on **30 September 2026** (Rathaus Umschau):
 
 ## Related
 
-[[entities/stadtrat]] · [[topics/olympia-bewerbung]] · [[sources/open-data-landschaft]]
+[[entities/stadtrat]], [[topics/olympia-bewerbung]], [[sources/open-data-landschaft]]

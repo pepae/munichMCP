@@ -56,4 +56,4 @@ The other districts held their 2026 assemblies in spring and summer. `citizens_a
 
 ## Related
 
-[[entities/bezirksausschuesse]] · [[entities/stadtrat]] · [[entities/stadtbezirke/07-sendling-westpark]] · [[topics/wahlen-2026]]
+[[entities/bezirksausschuesse]], [[entities/stadtrat]], [[entities/stadtbezirke/07-sendling-westpark]], [[topics/wahlen-2026]]

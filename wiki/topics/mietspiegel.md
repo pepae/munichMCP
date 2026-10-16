@@ -42,4 +42,4 @@ Durchschnittliche, gute and beste Lage, and their **central** variants (zentrale
 
 ## Related
 
-[[topics/milieuschutz]] · [[entities/stadtrat]] · [[entities/stadtbezirke]]
+[[topics/milieuschutz]], [[entities/stadtrat]], [[entities/stadtbezirke]]

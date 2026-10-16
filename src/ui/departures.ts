@@ -33,7 +33,7 @@ export function renderDepartures(root: HTMLElement, initial: DeparturesView, hos
   const btn = h("button", { onclick: () => refresh() }, "Refresh");
   root.append(
     h("div", { class: "row" }, h("h1", null, v.station.name), h("div", { class: "spacer" }), status, btn),
-    h("div", { class: "sub" }, `${v.station.place || "München"} · live departures`),
+    h("div", { class: "sub" }, `${v.station.place || "München"}, live departures`),
     h("table", { class: "board" }, body),
     h("div", { class: "attr" }, `Data: ${v.attribution ?? "MVG"}. Times are real-time where available. Unofficial munichMCP.`),
   );

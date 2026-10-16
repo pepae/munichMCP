@@ -46,4 +46,4 @@ Points and about 35 other measures at Neuperlach Süd and Therese-Giehse-Allee:
 
 ## Related
 
-[[entities/mvg-mvv]] · [[overview]]
+[[entities/mvg-mvv]], [[overview]]

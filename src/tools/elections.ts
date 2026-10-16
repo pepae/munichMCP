@@ -65,7 +65,7 @@ export function registerElectionTools(server: McpServer) {
           view: {
             kind: "bars",
             title: `${match.party}: ${e.def.label}`,
-            subtitle: `City-wide ${pct(match.pct)} · share by district`,
+            subtitle: `City-wide ${pct(match.pct)}, share by district`,
             unit: "%",
             rows: rows.map((r) => ({ label: `${r.code} ${r.name}`, value: r.pct ?? 0, display: pct(r.pct), highlight: false })),
             attribution: "Wahlamt der Landeshauptstadt München (dl-de/by-2.0)",
@@ -126,7 +126,7 @@ export function registerElectionTools(server: McpServer) {
           view: {
             kind: "bars",
             title: `${names[code] ?? code}: ${e.def.label}`,
-            subtitle: `Turnout ${pct(d.turnout_pct)} · strongest: ${winner?.party} ${pct(winner?.pct)} · city in brackets`,
+            subtitle: `Turnout ${pct(d.turnout_pct)}, strongest: ${winner?.party} ${pct(winner?.pct)}, city in brackets`,
             unit: "%",
             rows: top(d, 10).map((p) => {
               const c = e.city.parties.find((x) => x.party === p.party)?.pct;

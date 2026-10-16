@@ -28,7 +28,7 @@ The munichMCP wiki is an **LLM-maintained knowledge base** in the style Andrej K
 ## Rules for every write
 
 1. **Cite primary sources.** Put URLs in `sources` (frontmatter, set via the tool). Inline, say who published what and when. Never invent facts, numbers, dates or names; if a raw item is ambiguous, say so or skip it.
-2. **Link.** Use `[[slug]]` or `[[slug|label]]` to connect pages. A new page should link to at least two existing pages and be linked from `index.md` and from at least one related page.
+2. **Link.** Use `[[slug]]` or `[[slug|label]]` to connect pages. A new page should link to at least two existing pages and be linked from `index.md` and from at least one related page. In a "Related" section, separate links with commas.
 3. **Prefer updating over creating.** Search first (`wiki_search`). Merge new facts into the existing page and note the change date inline ("Stand: 2026-09-25").
 4. **Keep it current, not historical.** Pages describe the present state; history goes in a short "Timeline" section at the end of a page.
 5. **Neutral and practical.** No political opinions. Council motions are reported as "motion by X asks for Y", not endorsed. Write for residents: what does this mean, what can I do, where do I go.

@@ -42,4 +42,4 @@ The Stadtrat is Munich's elected council. Under Bavarian municipal law a city of
 
 ## Related
 
-[[entities/bezirksausschuesse]] · [[topics/buergerversammlungen]] · [[topics/wahlen-2026]] · [[topics/stadthaushalt]] · [[topics/mietspiegel]]
+[[entities/bezirksausschuesse]], [[topics/buergerversammlungen]], [[topics/wahlen-2026]], [[topics/stadthaushalt]], [[topics/mietspiegel]]

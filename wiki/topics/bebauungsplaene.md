@@ -29,4 +29,4 @@ The city notes that the web map is not a substitute for the official site plan.
 
 ## Related
 
-[[topics/milieuschutz]] · [[entities/stadtrat]]
+[[topics/milieuschutz]], [[entities/stadtrat]]

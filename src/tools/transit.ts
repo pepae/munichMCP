@@ -108,7 +108,7 @@ export function registerTransitTools(server: McpServer) {
         data: { from, to, trips: r.trips.map((t) => ({ ...t, legs: t.legs.map(({ path: _p, ...l }) => l) })), sources: [r.citation] },
         view: {
           kind: "map",
-          title: `${best.duration_min} min · ${best.changes} change${best.changes === 1 ? "" : "s"}`,
+          title: `${best.duration_min} min, ${best.changes} change${best.changes === 1 ? "" : "s"}`,
           subtitle: `${from.label} → ${to.label}, departs ${berlinTime(best.departure)}`,
           center: from,
           origin: { lat: from.lat, lon: from.lon, label: from.label },

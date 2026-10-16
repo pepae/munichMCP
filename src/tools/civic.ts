@@ -78,7 +78,7 @@ export function registerCivicTools(server: McpServer) {
           cards: next ? [{ title: "Next assembly", lines: [`${next.weekday} ${next.date}`, `${next.time}, ${next.venue}`] }] : [],
           markers: shown
             .filter((x) => x.lat !== undefined)
-            .map((x) => ({ lat: x.lat!, lon: x.lon!, label: `${x.date} ${x.time}: ${x.venue}`, sublabel: `District ${x.district} ${x.district_name} · ${x.street}`, color: x.date < today ? "#868e96" : "#1864ab" })),
+            .map((x) => ({ lat: x.lat!, lon: x.lon!, label: `${x.date} ${x.time}: ${x.venue}`, sublabel: `District ${x.district} ${x.district_name}, ${x.street}`, color: x.date < today ? "#868e96" : "#1864ab" })),
           attribution: "Landeshauptstadt München, Direktorium (dl-de/by-2.0)",
         },
       };

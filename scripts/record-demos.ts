@@ -86,7 +86,7 @@ function stage(page: Page): Stage {
       }
       await page.evaluate((s) => (document.querySelector("#demo-cap .q")!.textContent = s), question);
       await sleep(350);
-      await page.evaluate((s) => (document.querySelector("#demo-cap .t")!.textContent = s), `→ munichMCP · ${tool}`);
+      await page.evaluate((s) => (document.querySelector("#demo-cap .t")!.textContent = s), `→ munichMCP: ${tool}`);
       await page.evaluate(
         ({ tool, args }) => {
           (document.getElementById("tool") as HTMLSelectElement).value = tool;

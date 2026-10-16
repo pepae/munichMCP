@@ -33,4 +33,4 @@ munichMCP is an unofficial prototype of an MCP server the city could run itself.
 
 ## Related
 
-[[sources/open-data-landschaft]] · [[entities/stadtrat]]
+[[sources/open-data-landschaft]], [[entities/stadtrat]]

@@ -47,4 +47,4 @@ Themes that came up in several districts at once (motions are requests to the ad
 
 ## Related
 
-[[entities/stadtrat]] · [[topics/buergerversammlungen]] · [[entities/stadtbezirke]] · [[topics/stadthaushalt]]
+[[entities/stadtrat]], [[topics/buergerversammlungen]], [[entities/stadtbezirke]], [[topics/stadthaushalt]]

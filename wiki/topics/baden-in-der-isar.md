@@ -36,4 +36,4 @@ The city lists specific danger points, for example the weirs at the Flauchersteg
 
 ## Related
 
-[[entities/isar]] · [[entities/stadtbezirke/18-untergiesing-harlaching]]
+[[entities/isar]], [[entities/stadtbezirke/18-untergiesing-harlaching]]

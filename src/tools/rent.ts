@@ -200,14 +200,14 @@ export function registerRentTools(server: McpServer) {
         view: {
           kind: "form",
           title: "Mietspiegel 2025 rent check",
-          subtitle: `${WOHNLAGEN.find((w) => w.id === a.wohnlage)!.label} · ${r.year_class} · row ${r.area_row}`,
+          subtitle: `${WOHNLAGEN.find((w) => w.id === a.wohnlage)!.label}, ${r.year_class}, row ${r.area_row}`,
           tool: "estimate_rent",
           fields: FIELDS,
           values: a,
           result: {
             headline: "Average local comparative rent",
             big: `${fmt(r.average_monthly)} € / month`,
-            range: `${fmt(r.average_per_sqm)} €/m² · range ${fmt(r.range_monthly.low)} to ${fmt(r.range_monthly.high)} €`,
+            range: `${fmt(r.average_per_sqm)} €/m², range ${fmt(r.range_monthly.low)} to ${fmt(r.range_monthly.high)} €`,
             lines: a.current_rent_eur !== undefined ? [lines.find((l) => l.startsWith("Your rent"))!.split(". Note:")[0]] : [],
             tone,
           },

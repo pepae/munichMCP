@@ -32,4 +32,4 @@ On 25 September 2026 at 16:00 the gauge read 91 cm, 21.6 m³/s and 15.1 °C: far
 
 ## Related
 
-[[topics/baden-in-der-isar]] · [[entities/stadtbezirke]]
+[[topics/baden-in-der-isar]], [[entities/stadtbezirke]]

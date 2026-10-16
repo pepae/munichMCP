@@ -75,4 +75,4 @@ Every source has a manifest in the repository's `catalog/` folder (publisher, li
 
 ## Related
 
-[[overview]] · [[schema]] · [[topics/laerm-und-hochwasser]] · [[topics/wahlen-2026]] · [[topics/stadthaushalt]]
+[[overview]], [[schema]], [[topics/laerm-und-hochwasser]], [[topics/wahlen-2026]], [[topics/stadthaushalt]]

@@ -74,9 +74,9 @@ export function renderWikiPage(slug: string): string | undefined {
   if (!r) return undefined;
   const p = r.page;
   const sources = p.sources.length ? `<h2>Sources</h2><ul>${p.sources.map((s) => `<li>${/^https?:/.test(s) ? `<a href="${esc(s)}">${esc(s)}</a>` : esc(s)}</li>`).join("")}</ul>` : "";
-  const back = r.backlinks.length ? `<h2>Linked from</h2><p>${r.backlinks.map((b) => `<a href="/wiki/${esc(b.slug)}">${esc(b.title)}</a>`).join(" · ")}</p>` : "";
+  const back = r.backlinks.length ? `<h2>Linked from</h2><p>${r.backlinks.map((b) => `<a href="/wiki/${esc(b.slug)}">${esc(b.title)}</a>`).join(", ")}</p>` : "";
   return layout(
-    `${p.title} · munichMCP wiki`,
+    `${p.title} | munichMCP wiki`,
     `<p><span class="pill">${esc(p.type)}</span> ${p.updated ? `<span class="muted">updated ${esc(p.updated)}</span>` : ""} ${p.tags.map((t) => `<span class="pill">${esc(t)}</span>`).join(" ")}</p>
 <article>${renderMarkdown(p.body)}</article>${sources}${back}`,
   );
@@ -105,12 +105,12 @@ export function renderStatus(report: HealthReport | undefined, proposals: Propos
       const h = health.get(m.id);
       const failed = h?.checks.filter((c) => !c.ok) ?? [];
       const state = h ? `<span style="color:${DOT[h.status]};font-weight:600">${h.status}</span>` : `<span class="muted">not checked</span>`;
-      return `<tr><td><strong>${esc(m.name)}</strong><br><span class="muted">${esc(m.publisher)} · ${esc(m.licence)}</span></td><td>${state}</td><td>${h ? `${h.checks.filter((c) => c.ok).length}/${h.checks.length}` : ""}${failed.length ? `<br><span class="muted">${failed.map((c) => esc(`${c.name}: ${c.detail}`)).join("<br>")}</span>` : ""}</td><td>${m.implementation.kind === "code" ? "code" : `<span class="pill">YAML only</span>`}</td></tr>`;
+      return `<tr><td><strong>${esc(m.name)}</strong><br><span class="muted">${esc(m.publisher)}, ${esc(m.licence)}</span></td><td>${state}</td><td>${h ? `${h.checks.filter((c) => c.ok).length}/${h.checks.length}` : ""}${failed.length ? `<br><span class="muted">${failed.map((c) => esc(`${c.name}: ${c.detail}`)).join("<br>")}</span>` : ""}</td><td>${m.implementation.kind === "code" ? "code" : `<span class="pill">YAML only</span>`}</td></tr>`;
     })
     .join("");
   const open = proposals.filter((p) => p.status === "new" || p.status === "in_progress" || p.status === "pr_opened");
   return layout(
-    "Status · munichMCP",
+    "Status | munichMCP",
     `<h1>Data source status</h1>
 <p class="muted">${report ? `Checked ${esc(report.checked_at.slice(0, 16).replace("T", " "))} UTC: ${report.summary.ok} ok, ${report.summary.degraded} degraded, ${report.summary.failing} failing.` : "No check has run yet."} Checks run daily without any AI: is the source reachable, has its licence or schema changed, is it fresh, and do known questions still get the known answers. A weekly agent turns failures into repair pull requests that a maintainer approves.</p>
 <table><tr><th>Source</th><th>Health</th><th>Checks</th><th>Integration</th></tr>${rows}</table>

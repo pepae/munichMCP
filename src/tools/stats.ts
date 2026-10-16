@@ -98,7 +98,7 @@ export function registerStatsTools(server: McpServer) {
         view: {
           kind: "bars",
           title: `${r.indicator} (${r.variant}), ${r.year}`,
-          subtitle: `Munich: ${r.city ?? "n/a"} · 25 districts${r.district ? ` · highlighted: ${r.district.name}` : ""}`,
+          subtitle: `Munich: ${r.city ?? "n/a"}, 25 districts${r.district ? `, highlighted: ${r.district.name}` : ""}`,
           rows: sorted.map((d) => ({ label: `${d.code} ${d.name}`, value: d.value ?? 0, display: d.value === null ? "n/a" : String(d.value), highlight: d.code === r.district?.code })),
           note: r.unit_hint ? `Definition: ${r.unit_hint}` : undefined,
           attribution: "Statistisches Amt München, Indikatorenatlas (dl-de/by-2.0)",

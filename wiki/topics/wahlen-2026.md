@@ -41,4 +41,4 @@ Precinct results contain **in-person votes only**. In Munich more than half of v
 
 ## Related
 
-[[entities/stadtrat]] · [[entities/bezirksausschuesse]] · [[entities/stadtbezirke]] · [[topics/buergerversammlungen]]
+[[entities/stadtrat]], [[entities/bezirksausschuesse]], [[entities/stadtbezirke]], [[topics/buergerversammlungen]]

@@ -33,4 +33,4 @@ Munich is Germany's candidate to host the **Olympic and Paralympic Summer Games 
 
 ## Related
 
-[[entities/stadtrat]] · [[topics/stadthaushalt]] · [[overview]]
+[[entities/stadtrat]], [[topics/stadthaushalt]], [[overview]]

@@ -40,4 +40,4 @@ Check `transit_disruptions` for the current state.
 
 ## Related
 
-[[topics/radverkehrsnetz]] · [[topics/e-scooter-und-sharing]] · [[topics/u-bahn-sanierung-2026]]
+[[topics/radverkehrsnetz]], [[topics/e-scooter-und-sharing]], [[topics/u-bahn-sanierung-2026]]

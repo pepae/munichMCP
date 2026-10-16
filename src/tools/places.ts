@@ -56,7 +56,7 @@ export function registerPlaceTools(server: McpServer) {
           subtitle: `near ${loc.label}`,
           center: loc,
           origin: { lat: loc.lat, lon: loc.lon, label: loc.label },
-          markers: r.items.map((p) => ({ lat: p.lat, lon: p.lon, label: p.name, sublabel: [fmtDistance(p.distance_m), p.address].filter(Boolean).join(" · "), href: p.url, details: p.details })),
+          markers: r.items.map((p) => ({ lat: p.lat, lon: p.lon, label: p.name, sublabel: [fmtDistance(p.distance_m), p.address].filter(Boolean).join(", "), href: p.url, details: p.details })),
           attribution: r.citation.publisher,
         },
       };
@@ -147,7 +147,7 @@ export function registerPlaceTools(server: McpServer) {
           center: loc,
           origin: { lat: loc.lat, lon: loc.lon, label: loc.label },
           radius_m: a.radius_m,
-          markers: r.items.map((x) => ({ lat: x.lat, lon: x.lon, label: x.category, sublabel: `${x.status_text ?? x.status} · ${x.reported.slice(0, 10)} · ${fmtDistance(x.distance_m ?? 0)}`, href: x.url, color: x.status === "open" ? "#e67700" : "#868e96" })),
+          markers: r.items.map((x) => ({ lat: x.lat, lon: x.lon, label: x.category, sublabel: `${x.status_text ?? x.status}, ${x.reported.slice(0, 10)}, ${fmtDistance(x.distance_m ?? 0)}`, href: x.url, color: x.status === "open" ? "#e67700" : "#868e96" })),
           attribution: "machmuenchenbesser.de (CC0)",
         },
       };
@@ -214,8 +214,8 @@ export function registerPlaceTools(server: McpServer) {
             tone: r.escooter.parking_prohibited.length || r.escooter.riding_prohibited.length || r.escooter.must_use_designated_area ? "bad" : "good",
             text: r.escooter.verdict,
           },
-          shapes: [...uniq.values()].filter((s: any) => s._geometry).map((s: any) => ({ geometry: s._geometry, label: s.name, sublabel: `${s.t} parking · ${fmtDistance(s.distance_m)}`, color: "#2f9e44" })),
-          markers: [...uniq.values()].map((s) => ({ lat: s.lat, lon: s.lon, label: s.name, sublabel: `${s.allowed.join(", ")} · ${fmtDistance(s.distance_m)}` })),
+          shapes: [...uniq.values()].filter((s: any) => s._geometry).map((s: any) => ({ geometry: s._geometry, label: s.name, sublabel: `${s.t} parking, ${fmtDistance(s.distance_m)}`, color: "#2f9e44" })),
+          markers: [...uniq.values()].map((s) => ({ lat: s.lat, lon: s.lon, label: s.name, sublabel: `${s.allowed.join(", ")} (${fmtDistance(s.distance_m)})` })),
           attribution: r.citation.publisher,
         },
       };

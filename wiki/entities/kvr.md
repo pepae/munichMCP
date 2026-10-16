@@ -25,4 +25,4 @@ munichMCP does **not** book or scrape appointments. Automated appointment bookin
 
 ## Related
 
-[[entities/stadtrat]] · [[queries/2026-09-umzug-nach-muenchen]]
+[[entities/stadtrat]], [[queries/2026-09-umzug-nach-muenchen]]

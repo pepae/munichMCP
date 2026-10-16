@@ -46,4 +46,4 @@ These are requests, not decisions; `council_search` shows the current state of e
 
 ## Related
 
-[[entities/mvg-mvv]] · [[entities/stadtbezirke]]
+[[entities/mvg-mvv]], [[entities/stadtbezirke]]
