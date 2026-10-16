@@ -7,10 +7,11 @@ import { timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import { config } from "./config.js";
 import { createMaintainerServer, createPublicServer } from "./mcp.js";
-import { renderLanding, renderStatus, renderWikiIndex, renderWikiPage } from "./web.js";
+import { renderLanding, renderParticipate, renderStatus, renderWikiIndex, renderWikiPage } from "./web.js";
 import { catalog } from "./catalog/catalog.js";
 import { latestReport, scheduleHealthChecks } from "./catalog/health.js";
 import { listProposals } from "./catalog/proposals.js";
+import { communityGeoJson, communityStats, listCollections, listContributions, publishedRecords } from "./community/contributions.js";
 import { warmUp, scheduleRefresh } from "./warmup.js";
 import { scheduleCollector } from "./sources/wiki-collector.js";
 import { wiki } from "./sources/wiki.js";
@@ -81,12 +82,19 @@ app.get("/playground", (_req, res) => {
   });
 });
 app.get("/status", async (_req, res) => {
-  res.type("html").send(renderStatus(await latestReport(), await listProposals()));
+  res.type("html").send(renderStatus(await latestReport(), await listProposals(), (await communityStats()).issues_by_source));
 });
 app.get("/status.json", async (_req, res) => {
   const report = await latestReport();
   const proposals = (await listProposals()).map(({ id, name, url, status, created, pr_url }) => ({ id, name, url, status, created, pr_url }));
-  res.json({ sources: catalog.length, report, proposals });
+  res.json({ sources: catalog.length, report, proposals, community: await communityStats() });
+});
+app.get("/participate", async (_req, res) => {
+  const reports = [...(await listContributions({ kind: "data_issue", status: "open" })), ...(await listContributions({ kind: "data_issue", status: "acknowledged" }))];
+  res.type("html").send(renderParticipate(await listCollections(), await communityStats(), await publishedRecords({ limit: 20 }), reports.slice(0, 50)));
+});
+app.get("/community.geojson", async (_req, res) => {
+  res.type("application/geo+json").send(JSON.stringify(await communityGeoJson()));
 });
 app.get("/wiki", (_req, res) => res.type("html").send(renderWikiIndex()));
 app.get(/^\/wiki\/(.+)$/, (req, res) => {

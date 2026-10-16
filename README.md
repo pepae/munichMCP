@@ -8,16 +8,19 @@ It is an **unofficial** proposal for an official city MCP and is not affiliated 
   <img src="docs/media/address-report.gif" alt="Asking what applies at Wörthstraße 10: district, zoning plan, Milieuschutz, resident parking, solar potential, noise, flood risk and a map with nearby stops and facilities" width="820">
 </p>
 
-- Live server: `https://munichmcp.duckdns.org/mcp` (Streamable HTTP, no auth, read-only)
+- Live server: `https://munichmcp.duckdns.org/mcp` (Streamable HTTP, no auth; reads open data, writes only reviewed contributions)
 - Browser playground: `https://munichmcp.duckdns.org/playground`
 - Source health: `https://munichmcp.duckdns.org/status`
 - Wiki: `https://munichmcp.duckdns.org/wiki`
+- Take part: `https://munichmcp.duckdns.org/participate`
 
 ## Munich, headless
 
 People have started to ask instead of search. ChatGPT and Claude already let anyone add apps and connectors, and both have voice modes. For more and more people the assistant is becoming the first stop for every question, including questions about their city. If the city's data is not in the assistant, the assistant guesses.
 
-The idea is a **headless city**: the city provides data and services through one open interface (MCP), and every assistant is a front end. ChatGPT, Claude, the city's own MUCGPT, voice assistants. The first people this helps are the ones who never used a city website: older residents, people with visual or motor impairments, people who do not read German well, anyone who avoids forms and portals. Talking to an assistant is the first interface that asks nothing of them.
+The idea is a **headless city**: the city provides data and services through one open interface (MCP), and every assistant is a front end. ChatGPT, Claude, the city's own MUCGPT, open models running locally, voice assistants. People keep the assistant they already use or choose an open one; the city does not have to pick one model for everybody, and it stays responsible for what it knows best, its data. In the medium term this helps people who find apps and portals hard more than those already at home in them: older residents, people with visual or motor impairments, people who do not read German well. Asking a question in your own words, by voice if you like, asks very little of them.
+
+Using it is only the first step. The same interface lets people report wrong data, add what the city does not know yet and find their way into the city's own participation: see [From using to taking part](#from-using-to-taking-part).
 
 This is early, on purpose. Most residents have not added an app to an assistant yet. But the slow part is not the interface. It is finding the sources, clearing their licences, keeping the data correct and earning trust. That work has to start now so the layer is ready when people start talking to their city.
 
@@ -47,9 +50,10 @@ flowchart TB
 
   subgraph mcp["munichMCP"]
     direction LR
-    tools["28 tools<br/>answers with sources<br/>and licences"] -. "ui:// view" .-> view["MCP Apps view<br/>maps, departure boards,<br/>rent calculator, charts"]
+    tools["32 tools<br/>answers with sources<br/>and licences"] -. "ui:// view" .-> view["MCP Apps view<br/>maps, departure boards,<br/>rent calculator, charts"]
     tools --- wiki["agent-maintained<br/>wiki"]
     tools --- catalog["source catalog<br/>31 manifests,<br/>daily health checks"]
+    tools --- community["community data<br/>reviewed contributions,<br/>CC0"]
   end
 
   subgraph data["Official sources, cached for 30 seconds to a year"]
@@ -89,6 +93,10 @@ flowchart TB
 | `wiki_search`, `wiki_read`, `wiki_index` | Agent-maintained, cross-linked knowledge base | see below |
 | `data_sources` | Every source with publisher, licence and current health | source catalog |
 | `propose_data_source` | Suggest a new dataset or API; an agent prepares it, a human approves it | proposal inbox |
+| `report_data_issue` | Report wrong, outdated, missing or broken data; routed to whoever maintains the source | community database |
+| `contribute_data` | Add a data point (an accessibility barrier, an idea for a place, or a new kind of data); hands over to the city's own platform for damage | community database, machmuenchenbesser.de |
+| `community_data` | Browse reviewed contributions near a place or city-wide | community database (CC0) |
+| `contribution_status` | What happened to a contribution or a source proposal | community database |
 | `about_munichmcp` | Sources, licences, caveats | |
 
 Every result names its sources with licence and retrieval time. See `wiki/sources/open-data-landschaft.md` for the full licence analysis, including what is deliberately **not** used.
@@ -98,6 +106,39 @@ Every result names its sources with licence and retrieval time. See `wiki/source
 ### What the city could open next
 
 Some of the most useful data is published but not under an open licence, so munichMCP does not use it: primary school catchment areas (Grundschulsprengel) and the zoning-plan layer with PDF links both require a separate agreement with the city; the results of the 2026 mayoral runoff are online but not on the open data portal; live departures come from MVG's unofficial (tolerated) API rather than an official open feed. Opening these would make the official version much better.
+
+## From using to taking part
+
+munichMCP starts as a service: people ask, their assistant answers with the city's data. They are consumers first. The more they use it, the more it should invite them to give something back, until they take part in the city itself.
+
+```mermaid
+flowchart LR
+  use["1. Use<br/>ask about your street,<br/>rent, bus, office visit"] --> understand["2. Understand<br/>sources, council,<br/>budget, elections"]
+  understand --> feedback["3. Give feedback<br/>report wrong or<br/>missing data"]
+  feedback --> contribute["4. Contribute<br/>barriers, ideas,<br/>new data, new sources"]
+  contribute --> shape["5. Shape<br/>residents' assemblies,<br/>council, participation"]
+```
+
+| Step | What people do | Tools |
+|---|---|---|
+| Use | Get answers about their street, their rent, their next bus, an office visit | `address_report`, `departures`, `get_city_service`, ... |
+| Understand | See where answers come from and how the city works | `data_sources`, `wiki_search`, `council_search`, `city_budget`, `election_results` |
+| Give feedback | Say when something is wrong, outdated or missing | `report_data_issue` |
+| Contribute | Add what the city does not know yet, propose new kinds of data and new sources | `contribute_data`, `propose_data_source` |
+| Shape | Take part in the city itself | `citizens_assemblies`, `council_search` |
+
+The server instructions ask assistants to offer the next step when it fits: a report when the user notices a mistake, a contribution when they describe a barrier or an idea, the residents' assembly when they care about their district. Nothing is submitted without the user's confirmation.
+
+### Community data
+
+With these tools munichMCP is no longer only an aggregator: it keeps a small database of its own, for data that does not exist anywhere yet.
+
+- **Collections.** `barriers` (accessibility barriers) and `ideas` (ideas for a place) to start with. Any other collection name proposes a new kind of data; it opens when a maintainer publishes its first record.
+- **No parallel channels.** Where the city already runs a reporting channel, nothing is stored. A pothole goes to [Mach München besser](https://machmuenchenbesser.de): `contribute_data` shows the open reports nearby, so people can see whether it is already reported, and hands over with a prepared text. With an agreement, the same step could submit the report directly (the platform speaks Open311).
+- **Automatic checks first.** The place must be in Munich, the text must not contain personal data or credentials, daily volume is capped, and the same thing reported nearby counts as a confirmation instead of a duplicate. Confirmations show what matters to many people.
+- **A person decides.** Records stay pending until a maintainer publishes or rejects them (`review_queue`, `review_contribution` on the maintainer endpoint). Data reports are routed by the source's manifest owner; the weekly source doctor verifies them, fixes what is ours and drafts a message to the publisher for the rest. Only humans publish or reject.
+- **Open by default.** Published records are CC0 1.0, shown at [`/participate`](https://munichmcp.duckdns.org/participate) and exported as GeoJSON at [`/community.geojson`](https://munichmcp.duckdns.org/community.geojson). Pending text stays with the reviewers; anyone can follow a contribution's status with `contribution_status`.
+- **Storage.** One JSON file per contribution in `DATA_DIR/contributions`, enough for a prototype; an official deployment would move this to a database such as PostGIS without changing the tools.
 
 ## Self-maintaining sources
 
@@ -117,13 +158,13 @@ flowchart LR
 - **Catalog.** Every source has a manifest in [`catalog/`](catalog/README.md): publisher, licence, example questions and health checks. Point datasets need nothing else; a generic adapter turns them into a nearby search ([`ratschbankerl.yaml`](catalog/ratschbankerl.yaml) is the whole integration of the city's chat benches).
 - **Checks, without AI.** Reachable? Licence changed? Columns renamed? Still fresh? And **known answers**: Marienplatz 8 is in district 1, the Flaucher is in the 100-year flood zone, 70 m² built in 1965 in a central good location costs 961.80 € under the Mietspiegel. They catch data that is silently wrong, not just sources that are down. The server runs them daily and publishes them at [`/status`](https://munichmcp.duckdns.org/status); `npm run check-sources` runs them anywhere.
 - **Proposals.** Anyone can suggest a source with the `propose_data_source` tool or the "New data source" issue form. A maintainer labels it `intake-agent`, and the [intake agent](agents/source-intake.md) checks the licence (and stops if the terms are closed), explores the data, writes the manifest and checks, verifies them against a local server and opens a pull request.
-- **Repairs.** Every Monday the [source doctor](agents/source-doctor.md) reads the failing checks, finds the cause (a yearly file renamed, a column renamed, a layer moved) and opens a repair pull request, or an issue when a human must decide, for example after a licence change. A repair only counts if every known answer comes out exactly as before.
+- **Repairs.** Every Monday the [source doctor](agents/source-doctor.md) reads the failing checks and the open data reports from residents, finds the cause (a yearly file renamed, a column renamed, a layer moved) and opens a repair pull request, or an issue when a human must decide, for example after a licence change. A repair only counts if every known answer comes out exactly as before.
 - **Humans approve, machines verify.** CI runs the tests and the live checks of every changed source on each pull request. Merging deploys automatically; the deploy rolls back if the new release is not healthy or the end-to-end tests fail.
 - **Credentials.** A manifest never contains a key, only the name of a secret (`auth.secret_env`). Proposals that contain anything that looks like a key are rejected.
 
 On the first run the checks found the city's monthly population figures not updated for 151 days, and two sources listed in the registry that no code used.
 
-The agent workflows stay inactive until the repository secrets are set: `ANTHROPIC_API_KEY` (agents), `MUNICHMCP_MAINTAINER_TOKEN` (proposal inbox and wiki), `DEPLOY_HOST`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS` (automatic deploys).
+The agent workflows stay inactive until the repository secrets are set: `ANTHROPIC_API_KEY` (agents), `MUNICHMCP_MAINTAINER_TOKEN` (proposal inbox, data reports and wiki), `DEPLOY_HOST`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS` (automatic deploys).
 
 ## The wiki (agent-maintained knowledge base)
 
@@ -177,7 +218,7 @@ Environment: `PORT`, `PUBLIC_URL`, `DATA_DIR`, `WIKI_MAINTAINER_TOKEN` (enables 
 
 ## Deploy
 
-`deploy/deploy.sh root@host` packs the tree, builds the Docker image on the host and restarts the container (bound to 127.0.0.1:8420). If the new container does not become healthy it switches back to the previous image; `deploy/rollback.sh root@host` does the same on demand. The `deploy` workflow runs this after CI passes on `main`, then the end-to-end tests against production. `deploy/nginx-munichmcp.conf` is the reverse proxy (TLS via certbot). Data (caches, live wiki with its git history, health reports, proposals) lives in `/opt/munichmcp/data`.
+`deploy/deploy.sh root@host` packs the tree, builds the Docker image on the host and restarts the container (bound to 127.0.0.1:8420). If the new container does not become healthy it switches back to the previous image; `deploy/rollback.sh root@host` does the same on demand. The `deploy` workflow runs this after CI passes on `main`, then the end-to-end tests against production. `deploy/nginx-munichmcp.conf` is the reverse proxy (TLS via certbot). Data (caches, live wiki with its git history, health reports, proposals, community contributions) lives in `/opt/munichmcp/data`.
 
 ## Architecture
 
@@ -187,4 +228,4 @@ Environment: `PORT`, `PUBLIC_URL`, `DATA_DIR`, `WIKI_MAINTAINER_TOKEN` (enables 
 
 ## Licence and data
 
-Code: MIT. Data: each source keeps its licence (mostly dl-de/by-2.0, CC BY 4.0, CC0, MIT); see `about_munichmcp`. The Mietspiegel method is published by the city with all rights reserved; the rent tool can be switched off with `MIETSPIEGEL_ENABLED=0`.
+Code: MIT. Data: each source keeps its licence (mostly dl-de/by-2.0, CC BY 4.0, CC0, MIT); see `about_munichmcp`. Published community contributions are CC0 1.0. The Mietspiegel method is published by the city with all rights reserved; the rent tool can be switched off with `MIETSPIEGEL_ENABLED=0`.

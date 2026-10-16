@@ -1,9 +1,10 @@
 name: source doctor
 
 # Weekly: run every source's health checks against the public server (no AI).
-# If anything is degraded or failing and ANTHROPIC_API_KEY is set, the source
-# doctor agent diagnoses each problem and opens repair pull requests or issues.
-# A human approves every pull request.
+# If anything is degraded or failing, or residents reported problems with data
+# (report_data_issue), and ANTHROPIC_API_KEY is set, the source doctor agent
+# diagnoses each problem and opens repair pull requests or issues. Reading the
+# reports needs MUNICHMCP_MAINTAINER_TOKEN. A human approves every pull request.
 
 on:
   schedule:
@@ -25,6 +26,7 @@ jobs:
     timeout-minutes: 20
     outputs:
       problems: ${{ steps.run.outputs.problems }}
+      reports: ${{ steps.reports.outputs.reports }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,6 +41,12 @@ jobs:
           npm run check-sources -- --md health/report.md --json health/report.json || status=$?
           cat health/report.md >> "$GITHUB_STEP_SUMMARY"
           echo "problems=$([ "${status:-0}" != "0" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Count open data reports
+        id: reports
+        run: |
+          n=$(curl -fsS https://munichmcp.duckdns.org/status.json | jq '.community.issues_open // 0' || echo 0)
+          echo "Open data reports from residents: $n" >> "$GITHUB_STEP_SUMMARY"
+          echo "reports=$([ "${n:-0}" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: health-report
@@ -46,11 +54,13 @@ jobs:
 
   repair:
     needs: check
-    if: needs.check.outputs.problems == 'true'
+    if: needs.check.outputs.problems == 'true' || needs.check.outputs.reports == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      MUNICHMCP_MAINTAINER_TOKEN: ${{ secrets.MUNICHMCP_MAINTAINER_TOKEN }}
+      MUNICHMCP_URL: https://munichmcp.duckdns.org
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Check configuration
@@ -69,6 +79,14 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - name: Connect the maintainer endpoint
+        if: steps.cfg.outputs.skip != 'true'
+        run: |
+          if [ -n "$MUNICHMCP_MAINTAINER_TOKEN" ]; then
+            printf '{"mcpServers":{"munichmcp-maintainer":{"type":"http","url":"%s/maintainer/mcp","headers":{"Authorization":"Bearer %s"}}}}' "$MUNICHMCP_URL" "$MUNICHMCP_MAINTAINER_TOKEN" > "$RUNNER_TEMP/mcp.json"
+          else
+            echo '{"mcpServers":{}}' > "$RUNNER_TEMP/mcp.json"
+          fi
       - name: Run the source doctor agent
         if: steps.cfg.outputs.skip != 'true'
         run: |
@@ -78,7 +96,8 @@ jobs:
           git config user.email "source-doctor@users.noreply.github.com"
           claude -p "$(cat agents/source-doctor.md)
 
-          The report of this run is in health/report.json and health/report.md." \
+          The report of this run is in health/report.json and health/report.md. Open data reports from residents can be read with review_queue (kind data_issue) if the maintainer endpoint is connected." \
             --model claude-opus-5-5 \
-            --allowedTools "Read,Write,Edit,Glob,Grep,WebFetch,Bash(npm run *),Bash(npm ci),Bash(npm test),Bash(npx tsx *),Bash(node *),Bash(curl *),Bash(git *),Bash(gh pr *),Bash(gh issue *),Bash(sleep *),Bash(kill *)" \
+            --mcp-config "$RUNNER_TEMP/mcp.json" \
+            --allowedTools "Read,Write,Edit,Glob,Grep,WebFetch,mcp__munichmcp-maintainer__review_queue,mcp__munichmcp-maintainer__review_contribution,Bash(npm run *),Bash(npm ci),Bash(npm test),Bash(npx tsx *),Bash(node *),Bash(curl *),Bash(git *),Bash(gh pr *),Bash(gh issue *),Bash(sleep *),Bash(kill *)" \
             --max-turns 120

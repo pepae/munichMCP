@@ -36,6 +36,8 @@ const CASES: Case[] = [
   { tool: "estimate_rent", args: { address: "Wörthstraße 10", living_area_m2: 70, year_built: 1965, wohnlage: "zentral_gut", floor: "guter_boden", balcony_or_terrace: true, current_rent_eur: 1540 }, expect: /Average local comparative rent/, view: "form" },
   { tool: "damage_reports_near", args: { address: "Leopoldstraße 50", radius_m: 1500 }, expect: /citizen report/, view: "map" },
   { tool: "isar_conditions", args: {}, expect: /Isar/ },
+  { tool: "community_data", args: {}, expect: /Community collections/, view: "cards" },
+  { tool: "community_data", args: { collection: "barriers", address: "Marienplatz" }, expect: /Accessibility barriers within/, view: "map" },
   { tool: "weather_air_pollen", args: {}, expect: /Weather/i },
   { tool: "find_statistics", args: { query: "Arbeitslose" }, expect: /Indikatorenatlas/i },
   { tool: "district_stats", args: { dataset: "Einpersonenhaushalte", address: "Wörthstraße 10" }, expect: /All districts/, view: "bars" },

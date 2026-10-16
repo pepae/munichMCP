@@ -102,7 +102,7 @@ export function defineTool<S extends z.ZodObject>(
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[tool] ${name} failed ${Date.now() - started}ms: ${msg}`);
       const hint = err instanceof LocationError || err instanceof InputError ? "" : " The upstream data source may be temporarily unavailable; try again shortly.";
-      return { isError: true, content: [{ type: "text", text: `${name} failed: ${msg}.${hint}` }] };
+      return { isError: true, content: [{ type: "text", text: `${name} failed: ${msg}${/[.!?]$/.test(msg) ? "" : "."}${hint}` }] };
     }
   };
 
